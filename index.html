@@ -8,58 +8,59 @@
         :root {
             --primary: #00d2ff; --secondary: #3a7bd5; --dark: #0a0f1d;
             --card: #161e2d; --text: #ffffff; --accent: #f1c40f;
-            --success: #2ecc71; --error: #e74c3c;
+            --success: #2ecc71;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--dark); color: var(--text); overflow-x: hidden; }
+        body { background-color: var(--dark); color: var(--text); line-height: 1.6; }
         
         header {
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+            background: linear-gradient(rgba(10, 15, 29, 0.85), rgba(10, 15, 29, 0.85)), 
                         url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=1200');
-            height: 300px; display: flex; flex-direction: column; justify-content: center;
+            background-size: cover; background-position: center;
+            height: 320px; display: flex; flex-direction: column; justify-content: center;
             align-items: center; border-bottom: 4px solid var(--accent); text-align: center;
             padding: 20px;
         }
 
-        /* Grade Selection Navigation */
         .grade-nav {
-            display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; justify-content: center;
+            display: flex; gap: 12px; margin-top: 25px; flex-wrap: wrap; justify-content: center;
         }
         .grade-btn {
-            padding: 10px 25px; border: 2px solid var(--primary); background: transparent;
-            color: white; border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s;
+            padding: 12px 28px; border: 2px solid var(--primary); background: transparent;
+            color: white; border-radius: 50px; cursor: pointer; font-weight: 600; 
+            transition: all 0.3s ease; font-size: 0.9rem;
         }
         .grade-btn.active, .grade-btn:hover {
-            background: var(--primary); color: var(--dark);
+            background: var(--primary); color: var(--dark); box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
         }
 
-        .container { max-width: 1200px; margin: -40px auto 50px; padding: 0 20px; }
+        .container { max-width: 1200px; margin: -40px auto 60px; padding: 0 20px; }
         
+        .grade-section { display: none; animation: slideUp 0.5s ease-out forwards; }
+        .grade-section.active { display: block; }
+
         .subjects-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 20px; 
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+            gap: 25px; 
         }
 
         .subject-card {
-            background: var(--card); border-radius: 15px; overflow: hidden;
-            transition: 0.4s; border: 1px solid rgba(255,255,255,0.05); text-decoration: none;
-            display: block; color: inherit;
+            background: var(--card); border-radius: 18px; overflow: hidden;
+            transition: 0.3s; border: 1px solid rgba(255,255,255,0.05); text-decoration: none;
+            display: flex; flex-direction: column; color: inherit;
         }
-        .subject-card:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .subject-img { width: 100%; height: 140px; object-fit: cover; filter: brightness(0.8); }
-        .subject-info { padding: 15px; text-align: center; }
-        .subject-info h3 { color: var(--accent); margin-bottom: 5px; font-size: 1.2rem; }
-        .subject-info p { font-size: 0.85rem; opacity: 0.8; }
-
-        footer { text-align: center; padding: 40px; opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.1); }
+        .subject-card:hover { transform: translateY(-8px); border-color: var(--accent); }
         
-        /* Utility class to hide/show grades */
-        .grade-section { display: none; animation: fadeIn 0.5s ease; }
-        .grade-section.active { display: block; }
+        .subject-img { width: 100%; height: 150px; object-fit: cover; }
+        .subject-info { padding: 20px; text-align: center; }
+        .subject-info h3 { color: var(--accent); margin-bottom: 8px; font-size: 1.25rem; }
+        .subject-info p { font-size: 0.85rem; color: #a0a0a0; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+        footer { text-align: center; padding: 50px; opacity: 0.5; font-size: 0.9rem; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -68,91 +69,73 @@
 
 <header>
     <h1>EduLanka Pro</h1>
-    <p>Select your Grade and Subject to begin learning</p>
+    <p>Empowering Sri Lankan Students with Digital Excellence</p>
     <div class="grade-nav">
-        <button class="grade-btn active" onclick="showGrade('g6')">Grade 6</button>
-        <button class="grade-btn" onclick="showGrade('g7')">Grade 7</button>
-        <button class="grade-btn" onclick="showGrade('g8')">Grade 8</button>
-        <button class="grade-btn" onclick="showGrade('g9')">Grade 9</button>
+        <button class="grade-btn active" onclick="showGrade('g6', this)">Grade 6</button>
+        <button class="grade-btn" onclick="showGrade('g7', this)">Grade 7</button>
+        <button class="grade-btn" onclick="showGrade('g8', this)">Grade 8</button>
+        <button class="grade-btn" onclick="showGrade('g9', this)">Grade 9</button>
     </div>
 </header>
 
-<div class="container">
-    <div id="g6" class="grade-section active">
-        <h2 style="margin-bottom: 20px; text-align: center;">Grade 6 Subjects</h2>
-        <div class="subjects-grid">
-            <a href="grade6_science.html" class="subject-card">
-                <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=400" class="subject-img">
-                <div class="subject-info"><h3>Science</h3><p>Full Syllabus Available</p></div>
-            </a>
-            <a href="grade6_maths.html" class="subject-card">
-                <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=400" class="subject-img">
-                <div class="subject-info"><h3>Mathematics</h3><p>Practice Papers Included</p></div>
-            </a>
-            <a href="grade6_english.html" class="subject-card">
-                <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=400" class="subject-img">
-                <div class="subject-info"><h3>English</h3><p>Grammar & Vocabulary</p></div>
-            </a>
-            <a href="grade6_civic.html" class="subject-card">
-                <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&q=80&w=400" class="subject-img">
-                <div class="subject-info"><h3>Civic Education</h3><p>Lesson Guides</p></div>
-            </a>
-            <a href="grade6_geography.html" class="subject-card">
-                <img src="https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&q=80&w=400" class="subject-img">
-                <div class="subject-info"><h3>Geography</h3><p>Maps & Data</p></div>
-            </a>
-            <a href="grade6_health.html" class="subject-card">
-                <img src="https://images.unsplash.com/photo-1505751172107-5732488c371c?auto=format&fit=crop&q=80&w=400" class="subject-img">
-                <div class="subject-info"><h3>Health</h3><p>Physical Education</p></div>
-            </a>
-            <a href="grade6_ict.html" class="subject-card">
-                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=400" class="subject-img">
-                <div class="subject-info"><h3>ICT</h3><p>Modern Computing</p></div>
-            </a>
-        </div>
+<div class="container" id="main-content">
     </div>
-
-    <div id="g7" class="grade-section">
-        <h2 style="margin-bottom: 20px; text-align: center;">Grade 7 Subjects</h2>
-        <div class="subjects-grid">
-            <a href="grade7_science.html" class="subject-card"><img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=400" class="subject-img"><div class="subject-info"><h3>Science</h3><p>Grade 7 Content</p></div></a>
-            <a href="grade7_maths.html" class="subject-card"><img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=400" class="subject-img"><div class="subject-info"><h3>Mathematics</h3><p>Grade 7 Content</p></div></a>
-            </div>
-    </div>
-
-    <div id="g8" class="grade-section">
-        <h2 style="margin-bottom: 20px; text-align: center;">Grade 8 Subjects</h2>
-        <div class="subjects-grid">
-            <a href="grade8_science.html" class="subject-card"><img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=400" class="subject-img"><div class="subject-info"><h3>Science</h3><p>Grade 8 Content</p></div></a>
-            <a href="grade8_maths.html" class="subject-card"><img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=400" class="subject-img"><div class="subject-info"><h3>Mathematics</h3><p>Grade 8 Content</p></div></a>
-             </div>
-    </div>
-
-    <div id="g9" class="grade-section">
-        <h2 style="margin-bottom: 20px; text-align: center;">Grade 9 Subjects</h2>
-        <div class="subjects-grid">
-            <a href="grade9_science.html" class="subject-card"><img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=400" class="subject-img"><div class="subject-info"><h3>Science</h3><p>O/L Foundation</p></div></a>
-            <a href="grade9_maths.html" class="subject-card"><img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=400" class="subject-img"><div class="subject-info"><h3>Mathematics</h3><p>Advanced Lessons</p></div></a>
-             </div>
-    </div>
-</div>
 
 <footer>&copy; 2026 EduLanka Pro - Sri Lanka Education Support</footer>
 
 <script>
-    function showGrade(gradeId) {
-        // Hide all sections
-        document.querySelectorAll('.grade-section').forEach(section => {
-            section.classList.remove('active');
+    const subjects = [
+        { name: "Science", img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400", desc: "Experiments & Theory" },
+        { name: "Mathematics", img: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400", desc: "Numbers & Logic" },
+        { name: "English", img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400", desc: "Language & Literature" },
+        { name: "Civic Education", img: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=400", desc: "Society & Rights" },
+        { name: "Geography", img: "https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=400", desc: "World & Environment" },
+        { name: "Health", img: "https://media.istockphoto.com/id/1457889029/photo/group-of-food-with-high-content-of-dietary-fiber-arranged-side-by-side.jpg?s=612x612&w=0&k=20&c=SEyObHsbBsrd1XZlgEg389VT86BMFKZKfKReKyVPAk4=" },
+        { name: "ICT", img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400", desc: "Digital Technology" }
+    ];
+
+    const grades = [6, 7, 8, 9];
+
+    function init() {
+        const container = document.getElementById('main-content');
+        
+        grades.forEach(grade => {
+            const section = document.createElement('div');
+            section.id = `g${grade}`;
+            section.className = `grade-section ${grade === 6 ? 'active' : ''}`;
+            
+            let gridHTML = `<h2 style="margin-bottom: 25px; text-align: center;">Grade ${grade} Curriculum</h2>`;
+            gridHTML += `<div class="subjects-grid">`;
+            
+            subjects.forEach(sub => {
+                const fileName = `grade${grade}_${sub.name.toLowerCase().replace(' ', '_')}.html`;
+                gridHTML += `
+                    <a href="${fileName}" class="subject-card">
+                        <img src="${sub.img}" class="subject-img" alt="${sub.name}">
+                        <div class="subject-info">
+                            <h3>${sub.name}</h3>
+                            <p>${sub.desc}</p>
+                        </div>
+                    </a>`;
+            });
+            
+            gridHTML += `</div>`;
+            section.innerHTML = gridHTML;
+            container.appendChild(section);
         });
-        // Remove active class from buttons
-        document.querySelectorAll('.grade-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        // Show current section and activate button
-        document.getElementById(gradeId).classList.add('active');
-        event.currentTarget.classList.add('active');
     }
+
+    function showGrade(gradeId, btn) {
+        document.querySelectorAll('.grade-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(gradeId).classList.add('active');
+        btn.classList.add('active');
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+    }
+
+    // Run on load
+    init();
 </script>
 
 </body>
