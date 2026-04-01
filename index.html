@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduStream | Grade & Subject Portal</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --yellow: #fbbf24;
+            --text: #f1f5f9;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        .view { display: none; padding: 40px 20px; min-height: 100vh; }
+        .active-view { display: block; }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 { color: var(--yellow); font-size: 2.5rem; }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 40px 20px;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid #334155;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-8px);
+            background: #2d3e50;
+        }
+
+        .card h2 { font-size: 2.5rem; margin: 0; color: var(--yellow); }
+        .card h3 { font-size: 1.5rem; margin: 10px 0; color: var(--accent); }
+        
+        .btn-back {
+            background: var(--yellow);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="grade-view" class="view active-view">
+    <header>
+        <h1>SELECT YOUR GRADE</h1>
+    </header>
+    <div class="container">
+        <div class="grid">
+            <div class="card" onclick="openSubjects(6)"><h2>06</h2><p>Grade 6</p></div>
+            <div class="card" onclick="openSubjects(7)"><h2>07</h2><p>Grade 7</p></div>
+            <div class="card" onclick="openSubjects(8)"><h2>08</h2><p>Grade 8</p></div>
+            <div class="card" onclick="openSubjects(9)"><h2>09</h2><p>Grade 9</p></div>
+            <div class="card" onclick="openSubjects(10)"><h2>10</h2><p>Grade 10</p></div>
+            <div class="card" onclick="openSubjects(11)"><h2>11</h2><p>Grade 11</p></div>
+        </div>
+    </div>
+</div>
+
+<div id="subject-view" class="view">
+    <div class="container">
+        <button class="btn-back" onclick="changeView('grade-view')">← BACK TO GRADES</button>
+        <header>
+            <h1 id="selectedGradeLabel">Grade X</h1>
+            <p>Select a subject to continue</p>
+        </header>
+        <div class="grid">
+            <div class="card" onclick="openContent('Science')"><h3>Science</h3></div>
+            <div class="card" onclick="openContent('Mathematics')"><h3>Mathematics</h3></div>
+            <div class="card" onclick="openContent('English')"><h3>English</h3></div>
+            <div class="card" onclick="openContent('Sinhala')"><h3>Sinhala</h3></div>
+            <div class="card" onclick="openContent('History')"><h3>History</h3></div>
+            <div class="card" onclick="openContent('Geography')"><h3>Geography</h3></div>
+            <div class="card" onclick="openContent('ICT')"><h3>ICT</h3></div>
+        </div>
+    </div>
+</div>
+
+<div id="content-view" class="view">
+    <div class="container">
+        <button class="btn-back" onclick="changeView('subject-view')">← BACK TO SUBJECTS</button>
+        <h1 id="contentLabel" style="color: var(--accent);">Subject Content</h1>
+        <div style="background: var(--card); padding: 50px; border-radius: 20px; text-align: center; border: 1px dashed #475569;">
+            <p>Content for this subject will be displayed here.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentGrade = "";
+
+    function changeView(viewId) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
+        document.getElementById(viewId).classList.add('active-view');
+        window.scrollTo(0,0);
+    }
+
+    function openSubjects(grade) {
+        currentGrade = grade;
+        document.getElementById('selectedGradeLabel').innerText = "Grade " + grade;
+        changeView('subject-view');
+    }
+
+    function openContent(subject) {
+        document.getElementById('contentLabel').innerText = "Grade " + currentGrade + " - " + subject;
+        changeView('content-view');
+    }
+</script>
+
+</body>
+</html>
