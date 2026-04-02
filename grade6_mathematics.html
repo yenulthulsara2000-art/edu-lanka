@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 6 Maths Master | English Medium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --dark-bg: #0d1117;
+            --card-bg: #161b22;
+            --text: #c9d1d9;
+            --accent: #f1c40f;
+            --header-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--header-gradient);
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            color: var(--accent);
+            font-size: 3rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #lesson-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .lesson-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            border-color: var(--primary);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .card-content {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-content h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        #quiz-container {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #quiz-overlay-dark {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 17, 23, 0.85); 
+            z-index: -1;
+        }
+
+        .quiz-box {
+            max-width: 700px;
+            margin: 50px auto;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
+            border: 2px solid var(--primary);
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 12px 0;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .option-btn:hover {
+            background: var(--primary);
+            color: #000;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ff4d4d;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>MATHS MASTER</h1>
+    <p>Grade 6 | Explore the World of Mathematics</p>
+</header>
+
+<div class="container">
+    <div id="lesson-grid"></div>
+</div>
+
+<div id="quiz-container">
+    <div id="quiz-overlay-dark"></div>
+    <div class="quiz-box">
+        <button class="close-btn" onclick="closeQuiz()">&times;</button>
+        <h2 id="quiz-title" style="color: var(--accent); margin-top: 0;"></h2>
+        <div id="question-area">
+            <p id="q-text" style="font-size: 1.2rem; margin-bottom: 25px; line-height: 1.6;"></p>
+            <div id="options-area"></div>
+        </div>
+        <div id="score-screen" style="display:none; text-align: center;">
+            <h2 style="font-size: 3rem;">🌟</h2>
+            <h3>Quiz Completed!</h3>
+            <p id="final-score" style="font-size: 1.8rem; color: var(--primary); font-weight: bold;"></p>
+            <button class="option-btn" style="text-align:center; background: var(--accent); color: #000;" onclick="closeQuiz()">Back to Lessons</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Variable 'thumb' has been renamed to 'image' for better clarity
+    const mathsDatabase = [
+        {
+        title: "1. Circles",
+        image: "https://openclipart.org/image/2000px/223437",
+        quizBg: "https://t4.ftcdn.net/jpg/05/07/36/71/360_F_507367161_gyWGjTXabZhVcvCPhpUGqhysdfww2341.jpg",
+        questions: [
+            { q: "What is the instrument used to draw a perfect circle?", opts: ["Ruler", "Set Square", "Pair of Compasses", "Protractor"], a: 2 },
+            { q: "The straight line joining the center and any point on the circle is called?", opts: ["Diameter", "Chord", "Radius", "Arc"], a: 2 },
+            { q: "What is the fixed point in the middle of a circle called?", opts: ["Edge", "Center", "Border", "Corner"], a: 1 },
+            { q: "A straight line passing through the center and joining two points on the circle is?", opts: ["Radius", "Diameter", "Tangent", "Segment"], a: 1 },
+            { q: "The distance around the boundary of a circle is its?", opts: ["Area", "Volume", "Circumference", "Length"], a: 2 },
+            { q: "How many radii are equal to one diameter?", opts: ["1", "2", "3", "4"], a: 1 },
+            { q: "Which shape has no corners or edges?", opts: ["Square", "Triangle", "Circle", "Rectangle"], a: 2 },
+            { q: "All points on a circle are at an equal distance from the?", opts: ["Edge", "Diameter", "Center", "Chord"], a: 2 },
+            { q: "A part of the circumference of a circle is called an?", opts: ["Arc", "Sector", "Radius", "Chord"], a: 0 },
+            { q: "What do we use to mark the center point when drawing a circle?", opts: ["Pencil tip", "Compass needle", "Ruler edge", "Eraser"], a: 1 },
+            { q: "If the radius is 5cm, what is the diameter?", opts: ["5cm", "10cm", "15cm", "20cm"], a: 1 },
+            { q: "Which of these objects is circular?", opts: ["Book", "Coin", "Brick", "Egg"], a: 1 },
+            { q: "How many centers does a single circle have?", opts: ["Zero", "One", "Two", "Infinite"], a: 1 },
+            { q: "The needle of a compass stays on which part of the circle?", opts: ["Circumference", "Center", "Radius", "Diameter"], a: 1 },
+            { q: "A line segment joining any two points on a circle is a?", opts: ["Radius", "Chord", "Center", "Arc"], a: 1 },
+            { q: "The longest chord of a circle is the?", opts: ["Radius", "Tangent", "Diameter", "Arc"], a: 2 },
+            { q: "To draw a circle of 4cm radius, the gap in the compass should be?", opts: ["2cm", "4cm", "8cm", "1cm"], a: 1 },
+            { q: "Circular shapes are also known as?", opts: ["Linear", "Curvilinear", "Rectilinear", "Angular"], a: 1 },
+            { q: "Which tool is not needed to draw a circle?", opts: ["Pencil", "Compass", "Protractor", "Paper"], a: 2 },
+            { q: "A circle is a closed ______ figure.", opts: ["Straight", "Plane", "Solid", "Open"], a: 1 },
+            { q: "Half of a circle is called a?", opts: ["Quarter", "Semicircle", "Oval", "Sector"], a: 1 },
+            { q: "When you rotate a compass 360 degrees, you get a?", opts: ["Square", "Line", "Circle", "Point"], a: 2 },
+            { q: "The distance from the center to the edge is always?", opts: ["Changing", "Decreasing", "The same", "Increasing"], a: 2 },
+            { q: "Which of these is not a part of a circle?", opts: ["Radius", "Vertex", "Diameter", "Arc"], a: 1 },
+            { q: "The plural of radius is?", opts: ["Radiuses", "Radii", "Radials", "Rads"], a: 1 }
+        ]
+    },
+    {
+        title: "2. Place Value",
+        image: "https://t3.ftcdn.net/jpg/05/29/77/40/360_F_529774052_hU8jO5iS0KjO6jXkGq3h0Lp0n6Jm3T4A.jpg",
+        quizBg: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "What is the place value of 7 in 47,820?", opts: ["Tens", "Hundreds", "Thousands", "Ten-thousands"], a: 2 },
+            { q: "How many thousands are there in 1,000,000?", opts: ["10", "100", "1,000", "10,000"], a: 2 },
+            { q: "What is the value of 5 in 152?", opts: ["5", "50", "500", "0.5"], a: 1 },
+            { q: "In 9,876, which digit is in the hundreds place?", opts: ["9", "8", "7", "6"], a: 1 },
+            { q: "The standard form of 'Five thousand two hundred' is?", opts: ["5002", "5020", "5200", "50002"], a: 2 },
+            { q: "What happens to the value of a digit as it moves one place to the left?", opts: ["Decreases 10x", "Increases 10x", "Stays same", "Increases 2x"], a: 1 },
+            { q: "What is the smallest 4-digit number?", opts: ["9999", "1111", "1000", "0001"], a: 2 },
+            { q: "Write 400 + 30 + 5 in standard form.", opts: ["4305", "435", "4035", "453"], a: 1 },
+            { q: "What is the value of 0 in any place value?", opts: ["1", "10", "0", "Place dependent"], a: 2 },
+            { q: "In 12,345, the digit 1 is in which place?", opts: ["Thousands", "Ten-thousands", "Lakhs", "Hundreds"], a: 1 },
+            { q: "Which number has 6 in the units place?", opts: ["600", "162", "456", "654"], a: 2 },
+            { q: "What is ten more than 990?", opts: ["991", "1000", "1010", "1100"], a: 1 },
+            { q: "The word form of 10,005 is?", opts: ["Ten thousand five", "One thousand five", "Hundred thousand five", "Ten five"], a: 0 },
+            { q: "Which digit is in the thousands place in 84,321?", opts: ["8", "4", "3", "2"], a: 1 },
+            { q: "Value of 3 in 3,000,000 is?", opts: ["3 Million", "30 Thousand", "3 Hundred", "30 Million"], a: 0 },
+            { q: "One million is how many lakhs?", opts: ["1", "10", "100", "1000"], a: 1 },
+            { q: "Smallest 5-digit number using 1, 0, 2, 3, 4?", opts: ["01234", "10234", "12340", "43210"], a: 1 },
+            { q: "Expanded form of 208 is?", opts: ["20+8", "200+8", "200+80", "2+0+8"], a: 1 },
+            { q: "Place value of the underlined digit: 5<u>6</u>7?", opts: ["Tens", "Ones", "Hundreds", "Thousands"], a: 0 },
+            { q: "Which is greater: 45,000 or 44,999?", opts: ["45,000", "44,999", "Both equal", "None"], a: 0 },
+            { q: "Number of zeros in one lakh?", opts: ["3", "4", "5", "6"], a: 2 },
+            { q: "Number of zeros in ten million?", opts: ["5", "6", "7", "8"], a: 2 },
+            { q: "Value of the digit 9 in 0.9?", opts: ["Nine", "Ninety", "Nine-tenths", "Nine-hundredths"], a: 2 },
+            { q: "What number comes just before 1,000?", opts: ["99", "990", "999", "1001"], a: 2 },
+            { q: "Largest 3-digit number is?", opts: ["100", "900", "990", "999"], a: 3 }
+        ]
+    },
+    {
+        title: "3. Operations on Whole Numbers",
+        image: "https://images.unsplash.com/photo-1596495573826-3946d028b3f2?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1509228468518-180dd482195b?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "What is 450 + 350?", opts: ["700", "800", "750", "900"], a: 1 },
+            { q: "What is 1000 - 450?", opts: ["550", "650", "450", "500"], a: 0 },
+            { q: "Find the product of 12 and 5.", opts: ["50", "60", "70", "80"], a: 1 },
+            { q: "What is 144 divided by 12?", opts: ["10", "11", "12", "14"], a: 2 },
+            { q: "What is the result of 25 x 4?", opts: ["50", "75", "100", "125"], a: 2 },
+            { q: "Subtract 120 from 500.", opts: ["380", "480", "420", "320"], a: 0 },
+            { q: "What is the sum of 125, 250 and 75?", opts: ["400", "450", "500", "350"], a: 1 },
+            { q: "If you multiply any number by zero, the answer is?", opts: ["The number itself", "Zero", "One", "Undefined"], a: 1 },
+            { q: "15 + 0 = ?", opts: ["0", "1", "15", "150"], a: 2 },
+            { q: "What is the remainder when 17 is divided by 3?", opts: ["1", "2", "3", "0"], a: 1 },
+            { q: "Which operation is used to find the 'total'?", opts: ["Subtraction", "Division", "Addition", "Multiplication"], a: 2 },
+            { q: "What is 100 x 10?", opts: ["100", "1000", "10000", "10"], a: 1 },
+            { q: "Find the value of 80 / 4.", opts: ["10", "20", "30", "40"], a: 1 },
+            { q: "If a box has 12 pens, how many pens are in 10 boxes?", opts: ["22", "102", "120", "1200"], a: 2 },
+            { q: "What is 500 / 100?", opts: ["5", "50", "0.5", "500"], a: 0 },
+            { q: "Double of 150 is?", opts: ["200", "250", "300", "450"], a: 2 },
+            { q: "Half of 500 is?", opts: ["200", "250", "300", "150"], a: 1 },
+            { q: "What is 99 + 101?", opts: ["190", "200", "210", "201"], a: 1 },
+            { q: "What is 10 x 0 x 5?", opts: ["50", "10", "5", "0"], a: 3 },
+            { q: "Divide 1000 by 8.", opts: ["100", "125", "150", "200"], a: 1 },
+            { q: "Subtracting 0 from 50 results in?", opts: ["0", "50", "5", "None"], a: 1 },
+            { q: "What is 7 x 8?", opts: ["49", "54", "56", "63"], a: 2 },
+            { q: "What is 81 / 9?", opts: ["7", "8", "9", "10"], a: 2 },
+            { q: "Find the missing number: 20 + ___ = 50", opts: ["20", "30", "40", "10"], a: 1 },
+            { q: "What is 12 x 12?", opts: ["124", "144", "134", "142"], a: 1 }
+        ]
+    },
+    {
+        title: "4. Factors and Multiples",
+        image: "https://images.unsplash.com/photo-1509228468518-180dd482195b?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "Which of these is a factor of 10?", opts: ["3", "4", "5", "6"], a: 2 },
+            { q: "What is the smallest multiple of 5?", opts: ["0", "1", "5", "10"], a: 2 },
+            { q: "Is 7 a prime number?", opts: ["Yes", "No", "Only in odd numbers", "None"], a: 0 },
+            { q: "Which of these is a multiple of 8?", opts: ["12", "14", "16", "18"], a: 2 },
+            { q: "What are the factors of 6?", opts: ["1, 6", "2, 3", "1, 2, 3, 6", "1, 2, 6"], a: 2 },
+            { q: "A number that has only two factors (1 and itself) is called a?", opts: ["Even number", "Odd number", "Prime number", "Composite number"], a: 2 },
+            { q: "Which is the only even prime number?", opts: ["0", "2", "4", "6"], a: 1 },
+            { q: "What is the next multiple of 7 after 21?", opts: ["22", "27", "28", "35"], a: 2 },
+            { q: "Is 1 a prime number?", opts: ["Yes", "No", "Depends", "None"], a: 1 },
+            { q: "Which of these is a composite number?", opts: ["2", "3", "4", "5"], a: 2 },
+            { q: "The number 1 is a factor of ______.", opts: ["Only 1", "Even numbers only", "Every number", "Odd numbers only"], a: 2 },
+            { q: "What is the HCF of 8 and 12?", opts: ["2", "4", "8", "24"], a: 1 },
+            { q: "What is the LCM of 2 and 3?", opts: ["2", "3", "5", "6"], a: 3 },
+            { q: "Factors of 15 are?", opts: ["1, 3, 5, 15", "3, 5", "1, 15", "1, 5, 15"], a: 0 },
+            { q: "Which number is a multiple of every number?", opts: ["1", "0", "Itself", "None"], a: 1 },
+            { q: "What is the 5th multiple of 9?", opts: ["36", "45", "54", "63"], a: 1 },
+            { q: "How many factors does 13 have?", opts: ["1", "2", "3", "13"], a: 1 },
+            { q: "Which of these is NOT a factor of 20?", opts: ["2", "4", "5", "6"], a: 3 },
+            { q: "A number that has more than two factors is a?", opts: ["Prime", "Composite", "Odd", "Even"], a: 1 },
+            { q: "Is 25 a square number?", opts: ["Yes", "No", "Maybe", "None"], a: 0 },
+            { q: "The number of multiples of a number is ______.", opts: ["Fixed", "Finite", "Infinite", "Zero"], a: 2 },
+            { q: "Which is a factor of every even number?", opts: ["1", "2", "3", "4"], a: 1 },
+            { q: "Prime numbers between 1 and 10 are?", opts: ["1,3,5,7", "2,3,5,7", "2,4,6,8", "3,5,7,9"], a: 1 },
+            { q: "What is the smallest composite number?", opts: ["1", "2", "4", "6"], a: 2 },
+            { q: "The LCM of 4 and 6 is?", opts: ["12", "24", "2", "10"], a: 0 }
+        ]
+    },
+    {
+        title: "5. Angles",
+        image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "What is an angle that is exactly 90 degrees called?", opts: ["Acute", "Obtuse", "Right Angle", "Straight"], a: 2 },
+            { q: "An angle less than 90 degrees is?", opts: ["Acute", "Obtuse", "Reflex", "Right"], a: 0 },
+            { q: "An angle greater than 90 but less than 180 is?", opts: ["Acute", "Obtuse", "Reflex", "Right"], a: 1 },
+            { q: "What instrument is used to measure angles?", opts: ["Ruler", "Compass", "Protractor", "Scale"], a: 2 },
+            { q: "The unit used to measure angles is?", opts: ["Centimeter", "Gram", "Degree", "Liter"], a: 2 },
+            { q: "What is the angle of a straight line?", opts: ["90°", "180°", "270°", "360°"], a: 1 },
+            { q: "How many degrees are in a full circle?", opts: ["180°", "270°", "360°", "90°"], a: 2 },
+            { q: "A right angle looks like the letter?", opts: ["V", "L", "O", "X"], a: 1 },
+            { q: "The point where two lines meet to form an angle is the?", opts: ["Edge", "Side", "Vertex", "Center"], a: 2 },
+            { q: "A triangle where one angle is 90° is called a?", opts: ["Acute triangle", "Right-angled triangle", "Obtuse triangle", "Equilateral"], a: 1 },
+            { q: "How many right angles are in a square?", opts: ["1", "2", "3", "4"], a: 3 },
+            { q: "Which angle is smaller: 45° or 60°?", opts: ["45°", "60°", "Both same", "None"], a: 0 },
+            { q: "An angle of 120° is an ______ angle.", opts: ["Acute", "Obtuse", "Right", "Straight"], a: 1 },
+            { q: "If you turn North to East, what is the angle?", opts: ["45°", "90°", "180°", "360°"], a: 1 },
+            { q: "The two lines that form an angle are called?", opts: ["Vertices", "Arms", "Degrees", "Points"], a: 1 },
+            { q: "An angle of 30° is an ______ angle.", opts: ["Acute", "Obtuse", "Right", "Reflex"], a: 0 },
+            { q: "Which of these is a reflex angle?", opts: ["80°", "110°", "210°", "90°"], a: 2 },
+            { q: "At 3 o'clock, the hands of a clock form which angle?", opts: ["Acute", "Obtuse", "Right", "Straight"], a: 2 },
+            { q: "At 6 o'clock, the hands of a clock form which angle?", opts: ["90°", "180°", "360°", "45°"], a: 1 },
+            { q: "A protractor usually has scales from 0 to?", opts: ["90", "180", "360", "100"], a: 1 },
+            { q: "Can an angle be 0 degrees?", opts: ["Yes", "No", "Only in circles", "None"], a: 0 },
+            { q: "The sum of angles on a straight line is?", opts: ["90°", "180°", "360°", "270°"], a: 1 },
+            { q: "The small circle symbol (°) stands for?", opts: ["Percent", "Zero", "Degree", "Temperature"], a: 2 },
+            { q: "Which is larger: Right angle or Obtuse angle?", opts: ["Right", "Obtuse", "Both equal", "Depends"], a: 1 },
+            { q: "Half of a right angle is?", opts: ["30°", "45°", "60°", "90°"], a: 1 }
+        ]
+    },
+    {
+        title: "6. Directions",
+        image: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1500052604743-2468688c4a40?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "How many main directions are there?", opts: ["2", "4", "6", "8"], a: 1 },
+            { q: "Which direction does the sun rise from?", opts: ["North", "South", "East", "West"], a: 2 },
+            { q: "What is the direction opposite to North?", opts: ["South", "East", "West", "North-East"], a: 0 },
+            { q: "The direction between North and East is?", opts: ["South-East", "North-West", "North-East", "South-West"], a: 2 },
+            { q: "Which instrument is used to find directions?", opts: ["Thermometer", "Barometer", "Magnetic Compass", "Speedometer"], a: 2 },
+            { q: "When you face East, which direction is behind you?", opts: ["North", "South", "West", "North-East"], a: 2 },
+            { q: "The angle between North and East is?", opts: ["45°", "90°", "180°", "360°"], a: 1 },
+            { q: "Which direction is between South and West?", opts: ["South-East", "North-East", "South-West", "North-West"], a: 2 },
+            { q: "If you are facing North and turn 180°, you will face?", opts: ["East", "West", "South", "North"], a: 2 },
+            { q: "The needle of a compass always points to which direction?", opts: ["East", "West", "North", "South"], a: 2 },
+            { q: "How many sub-directions (intercardinal) are there?", opts: ["2", "4", "6", "8"], a: 1 },
+            { q: "Which direction is between North and West?", opts: ["North-East", "North-West", "South-East", "South-West"], a: 1 },
+            { q: "Moving in a clockwise direction from North, what is the next main direction?", opts: ["South", "West", "East", "North-West"], a: 2 },
+            { q: "What is the angle between North and North-East?", opts: ["90°", "45°", "180°", "22.5°"], a: 1 },
+            { q: "Which direction does the sun set?", opts: ["North", "South", "East", "West"], a: 3 },
+            { q: "In a map, the top side usually represents?", opts: ["South", "East", "West", "North"], a: 3 },
+            { q: "If you face West, South is to your ______.", opts: ["Right", "Left", "Front", "Back"], a: 1 },
+            { q: "Which direction is opposite to North-West?", opts: ["North-East", "South-East", "South-West", "South"], a: 1 },
+            { q: "The angle between two adjacent main directions is?", opts: ["45°", "90°", "135°", "180°"], a: 1 },
+            { q: "A turn from North-East to South-East is how many degrees?", opts: ["45°", "90°", "180°", "270°"], a: 1 },
+            { q: "If you face East, North is to your ______.", opts: ["Right", "Left", "Front", "Back"], a: 1 },
+            { q: "The direction exactly between South and East is?", opts: ["South-West", "South-East", "North-East", "North-West"], a: 1 },
+            { q: "Which direction is between North-West and South-West?", opts: ["North", "South", "East", "West"], a: 3 },
+            { q: "In ancient times, sailors used ______ to find directions at night.", opts: ["Moon", "Trees", "The North Star", "Wind"], a: 2 },
+            { q: "Facing South and turning 90° clockwise leads to?", opts: ["North", "East", "West", "South-East"], a: 2 }
+        ]
+    },
+    {
+        title: "7. Fractions",
+        image: "https://images.unsplash.com/photo-1509228468518-180dd482195b?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "The top number in a fraction is the?", opts: ["Denominator", "Numerator", "Integer", "Decimal"], a: 1 },
+            { q: "The bottom number in a fraction is the?", opts: ["Numerator", "Denominator", "Quotient", "Product"], a: 1 },
+            { q: "A fraction where the numerator is smaller than the denominator is a?", opts: ["Proper fraction", "Improper fraction", "Mixed number", "Unit fraction"], a: 0 },
+            { q: "Which of these is a unit fraction?", opts: ["2/3", "4/5", "1/4", "3/1"], a: 2 },
+            { q: "What is 1/2 + 1/2?", opts: ["1/4", "2/4", "1", "0"], a: 2 },
+            { q: "Which fraction is equivalent to 1/2?", opts: ["2/3", "2/4", "2/5", "2/6"], a: 1 },
+            { q: "What is 3/4 - 1/4?", opts: ["1/4", "2/4 (1/2)", "4/4", "0"], a: 1 },
+            { q: "A fraction like 5/2 is called an?", opts: ["Proper fraction", "Improper fraction", "Mixed fraction", "Simple fraction"], a: 1 },
+            { q: "Convert 1 and 1/2 into an improper fraction.", opts: ["1/2", "2/2", "3/2", "4/2"], a: 2 },
+            { q: "Which is larger: 1/2 or 1/4?", opts: ["1/2", "1/4", "Both same", "None"], a: 0 },
+            { q: "In 3/7, what is the denominator?", opts: ["3", "7", "10", "4"], a: 1 },
+            { q: "How many halves make a whole?", opts: ["1", "2", "3", "4"], a: 1 },
+            { q: "How many quarters make a whole?", opts: ["2", "4", "6", "8"], a: 1 },
+            { q: "What is 1/3 of 12?", opts: ["3", "4", "6", "9"], a: 1 },
+            { q: "A fraction that represents a part of a whole is a?", opts: ["Whole number", "Fraction", "Ratio", "Sum"], a: 1 },
+            { q: "Which fraction is the smallest?", opts: ["1/2", "1/3", "1/4", "1/5"], a: 3 },
+            { q: "What is 5/5 equal to?", opts: ["0", "1", "5", "10"], a: 1 },
+            { q: "Add 2/7 and 3/7.", opts: ["5/14", "5/7", "1/7", "6/7"], a: 1 },
+            { q: "What is 1 minus 1/4?", opts: ["1/4", "2/4", "3/4", "0"], a: 2 },
+            { q: "If you cut a cake into 8 equal pieces and eat 3, what fraction is left?", opts: ["3/8", "5/8", "1/8", "8/3"], a: 1 },
+            { q: "Which fraction is equal to 10/20?", opts: ["1/3", "1/4", "1/2", "1/5"], a: 2 },
+            { q: "What is the simplest form of 4/8?", opts: ["1/2", "2/4", "4/8", "1/4"], a: 0 },
+            { q: "In the fraction 1/6, '6' tells us the total number of ______ parts.", opts: ["Unequal", "Equal", "Small", "Large"], a: 1 },
+            { q: "What is 2/10 written in simplest form?", opts: ["1/2", "1/5", "2/5", "1/10"], a: 1 },
+            { q: "Two fractions that represent the same value are called ______ fractions.", opts: ["Different", "Equivalent", "Proper", "Mixed"], a: 1 }
+        ]
+    },
+    {
+        title: "8. Decimals",
+        image: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1509228468518-180dd482195b?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "The dot used in decimal numbers is called a?", opts: ["Full stop", "Comma", "Decimal point", "Colon"], a: 2 },
+            { q: "What is 0.5 as a fraction?", opts: ["1/5", "5/10 (1/2)", "5/100", "1/50"], a: 1 },
+            { q: "Which is the tenths place in 12.34?", opts: ["1", "2", "3", "4"], a: 2 },
+            { q: "How do you write 7/10 as a decimal?", opts: ["0.07", "0.7", "7.0", "0.77"], a: 1 },
+            { q: "What is 0.1 + 0.2?", opts: ["0.12", "0.3", "0.03", "3.0"], a: 1 },
+            { q: "Which is greater: 0.5 or 0.05?", opts: ["0.5", "0.05", "Both same", "None"], a: 0 },
+            { q: "What is 1.0 - 0.4?", opts: ["0.4", "0.5", "0.6", "1.4"], a: 2 },
+            { q: "Write 'Zero point zero three' in figures.", opts: ["0.3", "0.03", "0.003", "3.0"], a: 1 },
+            { q: "How many tenths make one whole?", opts: ["1", "5", "10", "100"], a: 2 },
+            { q: "What is 0.25 as a fraction?", opts: ["1/4", "1/2", "2/5", "1/25"], a: 0 },
+            { q: "In 5.67, what is the value of 7?", opts: ["7", "0.7", "0.07", "70"], a: 2 },
+            { q: "Add 1.5 and 2.5.", opts: ["3.0", "4.0", "3.5", "4.5"], a: 1 },
+            { q: "What is 0.9 + 0.1?", opts: ["0.10", "0.91", "1.0", "0.01"], a: 2 },
+            { q: "Which decimal represents 1/4?", opts: ["0.25", "0.4", "0.5", "0.75"], a: 0 },
+            { q: "Which decimal represents 3/4?", opts: ["0.34", "0.5", "0.75", "0.8"], a: 2 },
+            { q: "Write 12/100 as a decimal.", opts: ["1.2", "0.12", "0.012", "12.0"], a: 1 },
+            { q: "Which is smaller: 1.2 or 1.19?", opts: ["1.2", "1.19", "Both equal", "None"], a: 1 },
+            { q: "Decimal 0.8 is equal to how many tenths?", opts: ["0.8", "8", "80", "1/8"], a: 1 },
+            { q: "What is 5 - 0.1?", opts: ["4.0", "4.1", "4.9", "5.1"], a: 2 },
+            { q: "The first place to the right of the decimal point is?", opts: ["Ones", "Tenths", "Hundredths", "Tens"], a: 1 },
+            { q: "What is 0.6 written as a fraction in simplest form?", opts: ["6/10", "3/5", "1/6", "6/1"], a: 1 },
+            { q: "Compare: 0.7 ____ 0.70", opts: [">", "<", "=", "None"], a: 2 },
+            { q: "What is 0.5 + 0.5 + 0.5?", opts: ["1.0", "1.5", "0.15", "5.5"], a: 1 },
+            { q: "How many hundredths make one tenth?", opts: ["1", "10", "100", "0.1"], a: 1 },
+            { q: "What is 0.01 more than 0.99?", opts: ["1.0", "1.01", "0.100", "0.991"], a: 0 }
+        ]
+    },
+    {
+        title: "9. Mass",
+        image: "https://images.unsplash.com/photo-1510210118913-29df4851e97c?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "What is the basic SI unit for measuring mass?", opts: ["Gram", "Kilogram", "Milligram", "Ton"], a: 1 },
+            { q: "How many grams are there in 1 kilogram?", opts: ["10", "100", "1000", "10000"], a: 2 },
+            { q: "Which instrument is used to measure mass?", opts: ["Ruler", "Measuring Cylinder", "Electronic Balance", "Thermometer"], a: 2 },
+            { q: "1/2 kilogram is equal to how many grams?", opts: ["250g", "500g", "750g", "100g"], a: 1 },
+            { q: "Which is heavier: 1kg of cotton or 1kg of iron?", opts: ["Cotton", "Iron", "Both are equal", "Depends on size"], a: 2 },
+            { q: "How many milligrams make 1 gram?", opts: ["10", "100", "1000", "10"], a: 2 },
+            { q: "Convert 2.5kg into grams.", opts: ["25g", "250g", "2500g", "25000g"], a: 2 },
+            { q: "Which unit is best for measuring a gold ring?", opts: ["Kilograms", "Grams/Milligrams", "Tons", "Meters"], a: 1 },
+            { q: "What is 750g + 250g?", opts: ["1kg", "2kg", "500g", "1.5kg"], a: 0 },
+            { q: "3000g is equal to how many kilograms?", opts: ["3kg", "30kg", "0.3kg", "300kg"], a: 0 },
+            { q: "Subtract 200g from 1kg.", opts: ["700g", "800g", "900g", "600g"], a: 1 },
+            { q: "How many 250g packets make 1kg?", opts: ["2", "3", "4", "5"], a: 2 },
+            { q: "Which is the smallest mass?", opts: ["1g", "1mg", "1kg", "10mg"], a: 1 },
+            { q: "What is the mass of 1 liter of water (approx)?", opts: ["100g", "500g", "1kg", "2kg"], a: 2 },
+            { q: "Convert 0.75kg to grams.", opts: ["75g", "750g", "7.5g", "7500g"], a: 1 },
+            { q: "Mass measures the amount of ______ in an object.", opts: ["Space", "Weight", "Matter", "Gravity"], a: 2 },
+            { q: "How many 200g weights balance a 1kg weight?", opts: ["2", "4", "5", "10"], a: 2 },
+            { q: "Find the total: 1kg 200g + 800g.", opts: ["1kg 800g", "2kg", "2kg 200g", "1.8kg"], a: 1 },
+            { q: "Which unit is best for a truck's load?", opts: ["Grams", "Kilograms", "Tons", "Milligrams"], a: 2 },
+            { q: "What is 5000mg in grams?", opts: ["0.5g", "5g", "50g", "500g"], a: 1 },
+            { q: "1/4 of a kilogram is?", opts: ["100g", "200g", "250g", "500g"], a: 2 },
+            { q: "A person's mass is usually measured in?", opts: ["Grams", "Kilograms", "Milligrams", "Liters"], a: 1 },
+            { q: "What is 1.2kg in grams?", opts: ["120g", "1200g", "12g", "12000g"], a: 1 },
+            { q: "Which is larger: 999g or 1kg?", opts: ["999g", "1kg", "Equal", "None"], a: 1 },
+            { q: "How many kilograms are in 1 Ton?", opts: ["100", "500", "1000", "10000"], a: 2 }
+        ]
+    },
+    {
+        title: "10. Length",
+        image: "https://images.unsplash.com/photo-1581092162384-8987c1794ed9?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "What is the standard SI unit of length?", opts: ["Centimeter", "Meter", "Kilometer", "Inch"], a: 1 },
+            { q: "How many centimeters are in 1 meter?", opts: ["10", "100", "1000", "12"], a: 1 },
+            { q: "How many meters are in 1 kilometer?", opts: ["100", "500", "1000", "10000"], a: 2 },
+            { q: "How many millimeters are in 1 centimeter?", opts: ["1", "5", "10", "100"], a: 2 },
+            { q: "Which unit is best to measure the distance between two cities?", opts: ["Meters", "Centimeters", "Kilometers", "Millimeters"], a: 2 },
+            { q: "1/2 meter is equal to how many centimeters?", opts: ["25cm", "50cm", "75cm", "10cm"], a: 1 },
+            { q: "Which tool is best for measuring a small line in a book?", opts: ["Measuring Tape", "Ruler", "Trundle Wheel", "Odometer"], a: 1 },
+            { q: "Convert 5m into centimeters.", opts: ["50cm", "500cm", "5000cm", "0.5cm"], a: 1 },
+            { q: "What is 1500m in kilometers?", opts: ["1.5km", "15km", "0.15km", "150km"], a: 0 },
+            { q: "Which is the smallest length?", opts: ["1m", "1cm", "1mm", "1km"], a: 2 },
+            { q: "Add 40cm and 60cm.", opts: ["100m", "1m", "10cm", "1.5m"], a: 1 },
+            { q: "How many millimeters are in 1 meter?", opts: ["100", "1000", "10000", "10"], a: 1 },
+            { q: "Convert 2.5km to meters.", opts: ["250m", "2500m", "25000m", "25m"], a: 1 },
+            { q: "Which unit is used for the thickness of a coin?", opts: ["Kilometer", "Meter", "Centimeter", "Millimeter"], a: 3 },
+            { q: "What is 3/4 of a meter in cm?", opts: ["25cm", "50cm", "75cm", "80cm"], a: 2 },
+            { q: "Subtract 50cm from 2m.", opts: ["1.5m", "150cm", "Both are same", "1m"], a: 2 },
+            { q: "The distance around a field is called its?", opts: ["Area", "Volume", "Perimeter", "Height"], a: 2 },
+            { q: "10mm is equal to?", opts: ["1cm", "10cm", "1m", "0.1cm"], a: 0 },
+            { q: "Which is longer: 100cm or 1m?", opts: ["100cm", "1m", "They are equal", "100cm"], a: 2 },
+            { q: "A tailor uses which tool to measure your waist?", opts: ["Wooden Ruler", "Measuring Tape", "Scale", "Protractor"], a: 1 },
+            { q: "Convert 0.8m to cm.", opts: ["8cm", "80cm", "800cm", "0.08cm"], a: 1 },
+            { q: "What is 5km + 500m?", opts: ["5500m", "5.5km", "Both are same", "5005m"], a: 2 },
+            { q: "How many centimeters are in 2.5 meters?", opts: ["25cm", "250cm", "2500cm", "205cm"], a: 1 },
+            { q: "Length of a standard cricket pitch is measured in?", opts: ["Kilometers", "Yards/Meters", "Millimeters", "Centimeters"], a: 1 },
+            { q: "Which unit is best for the length of a pencil?", opts: ["Centimeter", "Kilometer", "Meter", "Millimeter"], a: 0 }
+        ]
+    },
+    {
+        title: "11. Time",
+        image: "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1495364141860-b0d03eedd022?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "How many seconds are in 1 minute?", opts: ["30", "60", "100", "12"], a: 1 },
+            { q: "How many minutes are in 1 hour?", opts: ["60", "120", "24", "100"], a: 0 },
+            { q: "How many hours are in a full day?", opts: ["12", "24", "48", "60"], a: 1 },
+            { q: "How many days are in a leap year?", opts: ["364", "365", "366", "367"], a: 2 },
+            { q: "The long hand of a clock measures?", opts: ["Hours", "Minutes", "Seconds", "Days"], a: 1 },
+            { q: "The short hand of a clock measures?", opts: ["Hours", "Minutes", "Seconds", "Weeks"], a: 0 },
+            { q: "How many weeks are in a year (approx)?", opts: ["48", "50", "52", "60"], a: 2 },
+            { q: "What is 'noon' in 24-hour time?", opts: ["00:00", "12:00", "24:00", "06:00"], a: 1 },
+            { q: "How many months have 31 days?", opts: ["4", "5", "7", "12"], a: 2 },
+            { q: "Which month has 28 or 29 days?", opts: ["January", "February", "March", "April"], a: 1 },
+            { q: "What is 15 minutes after 10:45?", opts: ["10:50", "11:00", "11:15", "11:30"], a: 1 },
+            { q: "How many years are in a decade?", opts: ["10", "50", "100", "1000"], a: 0 },
+            { q: "How many years are in a century?", opts: ["10", "50", "100", "1000"], a: 2 },
+            { q: "What does 'a.m.' stand for?", opts: ["After Midday", "Ante Meridiem", "At Morning", "After Midnight"], a: 1 },
+            { q: "What does 'p.m.' stand for?", opts: ["Past Midday", "Post Meridiem", "Post Morning", "Pre Midday"], a: 1 },
+            { q: "Convert 2 hours into minutes.", opts: ["60", "100", "120", "180"], a: 2 },
+            { q: "How many seconds are in 5 minutes?", opts: ["150", "250", "300", "500"], a: 2 },
+            { q: "A leap year occurs every ______ years.", opts: ["2", "4", "5", "10"], a: 1 },
+            { q: "How many days are in the month of June?", opts: ["28", "29", "30", "31"], a: 2 },
+            { q: "If the time is 20:00, what is it in 12-hour time?", opts: ["8:00 a.m.", "8:00 p.m.", "10:00 p.m.", "6:00 p.m."], a: 1 },
+            { q: "How many minutes are in 1/4 of an hour?", opts: ["15", "20", "30", "45"], a: 0 },
+            { q: "How many minutes are in 1/2 of an hour?", opts: ["15", "25", "30", "40"], a: 2 },
+            { q: "What is the time 2 hours before 1:00 p.m.?", opts: ["11:00 a.m.", "11:00 p.m.", "12:00 a.m.", "10:00 a.m."], a: 0 },
+            { q: "A digital clock showing 00:30 means it is?", opts: ["12:30 a.m.", "12:30 p.m.", "6:30 a.m.", "6:30 p.m."], a: 0 },
+            { q: "How many days are in 3 weeks?", opts: ["14", "21", "28", "30"], a: 1 }
+        ]
+    },
+    {
+        title: "12. Parallel Straight Line Segments",
+        image: "https://images.unsplash.com/photo-1509228468518-180dd482195b?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "Lines that never meet, no matter how far they are extended, are called?", opts: ["Intersecting lines", "Perpendicular lines", "Parallel lines", "Curved lines"], a: 2 },
+            { q: "The distance between two parallel lines is always?", opts: ["Changing", "Increasing", "Decreasing", "The same"], a: 3 },
+            { q: "Which symbol is often used to show that lines are parallel in a diagram?", opts: ["Dots", "Arrows", "Circles", "Squares"], a: 1 },
+            { q: "Which of these real-world objects shows parallel lines?", opts: ["Railway tracks", "A clock at 3:00", "A pyramid", "A bicycle wheel"], a: 0 },
+            { q: "A rectangle has how many pairs of parallel sides?", opts: ["1", "2", "3", "4"], a: 1 },
+            { q: "If two lines are perpendicular to the same line, they are ______ to each other.", opts: ["Perpendicular", "Parallel", "Intersecting", "None"], a: 1 },
+            { q: "Can parallel lines be curved?", opts: ["Yes", "No", "Only in circles", "Depends"], a: 1 },
+            { q: "A square has how many pairs of parallel sides?", opts: ["1", "2", "3", "4"], a: 1 },
+            { q: "Which letter of the alphabet has parallel lines?", opts: ["A", "L", "H", "V"], a: 2 },
+            { q: "In a trapezium, how many pairs of sides are parallel?", opts: ["At least 1", "Exactly 2", "0", "3"], a: 0 },
+            { q: "The opposite sides of a parallelogram are always?", opts: ["Perpendicular", "Parallel", "Unequal", "Intersecting"], a: 1 },
+            { q: "The rungs of a ladder are ______ to each other.", opts: ["Perpendicular", "Parallel", "Diagonal", "Crossing"], a: 1 },
+            { q: "If two lines meet at a 90° angle, they are ______.", opts: ["Parallel", "Perpendicular", "Horizontal", "Vertical"], a: 1 },
+            { q: "Parallel lines are always in the same ______.", opts: ["Direction", "Plane", "Length", "Color"], a: 1 },
+            { q: "Which tool is best to check if two lines are parallel?", opts: ["Protractor", "Set square", "Compass", "Ruler only"], a: 1 },
+            { q: "Do parallel lines have a point of intersection?", opts: ["Yes, one", "Yes, many", "No", "Only if extended"], a: 2 },
+            { q: "The lines on a ruled exercise book are?", opts: ["Intersecting", "Perpendicular", "Parallel", "Zig-zag"], a: 2 },
+            { q: "Which of these shapes has NO parallel sides?", opts: ["Square", "Rectangle", "Triangle", "Hexagon"], a: 2 },
+            { q: "In the letter 'E', the three horizontal bars are?", opts: ["Parallel", "Perpendicular", "Intersecting", "Curved"], a: 0 },
+            { q: "Vertical lines are ______ to each other.", opts: ["Perpendicular", "Parallel", "Diagonal", "Opposite"], a: 1 },
+            { q: "The distance between parallel lines is measured along a ______ line.", opts: ["Parallel", "Perpendicular", "Slanted", "Curved"], a: 1 },
+            { q: "A rhombus has how many pairs of parallel sides?", opts: ["1", "2", "0", "4"], a: 1 },
+            { q: "Which of these is NOT a property of parallel lines?", opts: ["Same distance apart", "Never meet", "Must be same length", "In the same plane"], a: 2 },
+            { q: "Opposite edges of a ruler are?", opts: ["Perpendicular", "Parallel", "Meeting at one end", "Curved"], a: 1 },
+            { q: "Horizontal lines are ______ to each other.", opts: ["Perpendicular", "Parallel", "Vertical", "Crossing"], a: 1 }
+        ]
+    },
+    {
+        title: "13. Liquid Measurements",
+        image: "https://images.unsplash.com/photo-1544003385-a4968a521acc?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "What is the standard SI unit for measuring volume of liquids?", opts: ["Gram", "Meter", "Liter", "Celsius"], a: 2 },
+            { q: "How many milliliters are in 1 liter?", opts: ["10", "100", "1000", "10000"], a: 2 },
+            { q: "Which instrument is used to measure liquid volume accurately in a lab?", opts: ["Ruler", "Electronic Balance", "Measuring Cylinder", "Thermometer"], a: 2 },
+            { q: "1/2 liter is equal to how many milliliters?", opts: ["250ml", "500ml", "750ml", "100ml"], a: 1 },
+            { q: "How many milliliters are in 2.5 liters?", opts: ["25ml", "250ml", "2500ml", "25000ml"], a: 2 },
+            { q: "A small medicine spoon usually holds how many ml?", opts: ["5ml", "50ml", "100ml", "500ml"], a: 0 },
+            { q: "Which is the larger volume: 900ml or 1L?", opts: ["900ml", "1L", "Both are equal", "None"], a: 1 },
+            { q: "Convert 3000ml into liters.", opts: ["3L", "30L", "0.3L", "300L"], a: 0 },
+            { q: "What is 750ml + 250ml?", opts: ["1L", "2L", "500ml", "1.5L"], a: 0 },
+            { q: "How many 200ml cups are needed to fill a 1L bottle?", opts: ["2", "4", "5", "10"], a: 2 },
+            { q: "Capacity is the amount of liquid a container can ______.", opts: ["Spill", "Hold", "Create", "Heat"], a: 1 },
+            { q: "Which unit is best for measuring the water in a swimming pool?", opts: ["Milliliters", "Liters", "Kilograms", "Grams"], a: 1 },
+            { q: "What is 1/4 of a liter in milliliters?", opts: ["100ml", "200ml", "250ml", "500ml"], a: 2 },
+            { q: "Subtract 300ml from 1.5L.", opts: ["1.2L", "1200ml", "Both are same", "1L"], a: 2 },
+            { q: "0.5L is equal to how many ml?", opts: ["5ml", "50ml", "500ml", "5000ml"], a: 2 },
+            { q: "Which is the smallest volume?", opts: ["1L", "10ml", "100ml", "1ml"], a: 3 },
+            { q: "How many milliliters in 0.01 liters?", opts: ["1ml", "10ml", "100ml", "0.1ml"], a: 1 },
+            { q: "Add 1L 200ml and 800ml.", opts: ["1L 800ml", "2L", "1.8L", "2.2L"], a: 1 },
+            { q: "Convert 0.75L into milliliters.", opts: ["75ml", "750ml", "7.5ml", "7500ml"], a: 1 },
+            { q: "Which unit is used for a small perfume bottle?", opts: ["Liter", "Milliliter", "Kilometer", "Gram"], a: 1 },
+            { q: "If a tank holds 5000L, how many cubic meters is that?", opts: ["5", "50", "500", "5000"], a: 0 },
+            { q: "What is 3/4 of a liter in ml?", opts: ["250ml", "500ml", "750ml", "800ml"], a: 2 },
+            { q: "Which liquid measurement is approx one standard cup?", opts: ["50ml", "250ml", "500ml", "1000ml"], a: 1 },
+            { q: "4000ml is equal to ______ liters.", opts: ["4", "40", "0.4", "400"], a: 0 },
+            { q: "Volume is measured in ______ units.", opts: ["Square", "Cubic", "Linear", "Mass"], a: 1 }
+        ]
+    },
+    {
+        title: "14. Area",
+        image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1509228468518-180dd482195b?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "Area is the measure of the ______ covered by a shape.", opts: ["Boundary", "Surface", "Weight", "Height"], a: 1 },
+            { q: "What is the standard unit of area?", opts: ["Meter", "Square Meter (m²)", "Cubic Meter", "Centimeter"], a: 1 },
+            { q: "The formula for the area of a rectangle is?", opts: ["L + W", "2(L + W)", "Length × Width", "Side × Side"], a: 2 },
+            { q: "Find the area of a square with side 5cm.", opts: ["10cm²", "20cm²", "25cm²", "50cm²"], a: 2 },
+            { q: "Find the area of a rectangle with length 6cm and width 4cm.", opts: ["10cm²", "20cm²", "24cm²", "12cm²"], a: 2 },
+            { q: "What is the area of a square if its side is 10m?", opts: ["40m²", "100m²", "10m²", "20m²"], a: 1 },
+            { q: "If the area of a rectangle is 20cm² and its length is 5cm, what is its width?", opts: ["4cm", "15cm", "100cm", "2cm"], a: 0 },
+            { q: "How many cm² are in 1m²?", opts: ["100", "1000", "10000", "100000"], a: 2 },
+            { q: "Area is always measured in ______ units.", opts: ["Linear", "Square", "Cubic", "Decimal"], a: 1 },
+            { q: "Which tool can be used to estimate the area of an irregular shape?", opts: ["Ruler", "Square grid paper", "Protractor", "Compass"], a: 1 },
+            { q: "To find the area of a square, you multiply the side by ______.", opts: ["2", "4", "Itself", "10"], a: 2 },
+            { q: "Which has a larger area: 4cm x 4cm square or 5cm x 3cm rectangle?", opts: ["Square (16cm²)", "Rectangle (15cm²)", "Both same", "None"], a: 0 },
+            { q: "Find the area of a rectangle with L=10cm and W=2.5cm.", opts: ["12.5cm²", "20cm²", "25cm²", "250cm²"], a: 2 },
+            { q: "If the side of a square doubles, the area becomes ______ times larger.", opts: ["2", "3", "4", "8"], a: 2 },
+            { q: "Which unit is best for the area of a classroom floor?", opts: ["mm²", "cm²", "m²", "km²"], a: 2 },
+            { q: "Which unit is best for the area of a postage stamp?", opts: ["cm²", "m²", "km²", "mm²"], a: 0 },
+            { q: "The space inside a boundary is called?", opts: ["Perimeter", "Area", "Volume", "Mass"], a: 1 },
+            { q: "A floor tile is 1m x 1m. What is its area?", opts: ["1m", "1m²", "2m²", "4m²"], a: 1 },
+            { q: "If a rectangle has an area of 50cm² and width 5cm, length is?", opts: ["10cm", "45cm", "250cm", "5cm"], a: 0 },
+            { q: "Area of a square with side 1cm is called 1 ______.", opts: ["Linear cm", "Square cm", "Cubic cm", "cm"], a: 1 },
+            { q: "Area of a triangle is often half of the area of a ______.", opts: ["Circle", "Rectangle", "Hexagon", "Pentagon"], a: 1 },
+            { q: "If area is 36cm², what is the side of the square?", opts: ["4cm", "6cm", "9cm", "18cm"], a: 1 },
+            { q: "Area of a field 100m long and 50m wide is?", opts: ["150m²", "500m²", "5000m²", "50000m²"], a: 2 },
+            { q: "Can two different rectangles have the same area?", opts: ["Yes", "No", "Only if squares", "Never"], a: 0 },
+            { q: "Which is the smallest area?", opts: ["1m²", "1cm²", "1mm²", "1km²"], a: 2 }
+        ]
+    },
+    {
+        title: "15. Volume",
+        image: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "Volume is the amount of ______ occupied by a solid object.", opts: ["Area", "Space", "Weight", "Length"], a: 1 },
+            { q: "What is the SI unit for volume?", opts: ["Square meter", "Cubic meter (m³)", "Liter", "Meter"], a: 1 },
+            { q: "The formula for the volume of a cuboid is?", opts: ["L + W + H", "L × W", "Length × Width × Height", "2(L+W)"], a: 2 },
+            { q: "Find the volume of a cube with side 2cm.", opts: ["4cm³", "6cm³", "8cm³", "12cm³"], a: 2 },
+            { q: "What is the volume of a cuboid with L=5cm, W=2cm, H=3cm?", opts: ["10cm³", "15cm³", "30cm³", "60cm³"], a: 2 },
+            { q: "How many cubic centimeters (cm³) are in 1 milliliter (ml)?", opts: ["1", "10", "100", "1000"], a: 0 },
+            { q: "1 liter is equal to how many cm³?", opts: ["10", "100", "1000", "10000"], a: 2 },
+            { q: "If the side of a cube is 1m, its volume is?", opts: ["1m²", "1m³", "3m³", "6m³"], a: 1 },
+            { q: "Volume is measured in ______ units.", opts: ["Linear", "Square", "Cubic", "Degree"], a: 2 },
+            { q: "A cuboid has how many faces?", opts: ["4", "6", "8", "12"], a: 1 },
+            { q: "Find the volume of a box with L=10cm, W=10cm, H=10cm.", opts: ["100cm³", "1000cm³", "30cm³", "10cm³"], a: 1 },
+            { q: "If a cuboid's volume is 24cm³ and its base area is 8cm², what is its height?", opts: ["2cm", "3cm", "4cm", "16cm"], a: 1 },
+            { q: "Which has more volume: 1L of water or 1000cm³ of iron?", opts: ["Water", "Iron", "Both are equal", "None"], a: 2 },
+            { q: "How many cm³ are in 1m³?", opts: ["100", "10,000", "1,000,000", "1,000"], a: 2 },
+            { q: "Capacity is another word used for the volume of ______.", opts: ["Solids", "Liquids/Gases", "Length", "Area"], a: 1 },
+            { q: "The space inside a hollow container is its?", opts: ["Mass", "Area", "Capacity", "Perimeter"], a: 2 },
+            { q: "A cube is a special cuboid where all ______ are equal.", opts: ["Angles", "Edges", "Colors", "Vertices"], a: 1 },
+            { q: "Find the volume of a cuboid with L=4m, W=0.5m, H=2m.", opts: ["4m³", "2m³", "8m³", "1m³"], a: 0 },
+            { q: "Which unit is best for the volume of a juice box?", opts: ["m³", "cm³", "km³", "mm³"], a: 1 },
+            { q: "If you stack 5 cubes of 1cm³ each, the total volume is?", opts: ["1cm³", "5cm³", "25cm³", "125cm³"], a: 1 },
+            { q: "Volume of a cube with side 's' is?", opts: ["4s", "s²", "s³", "6s"], a: 2 },
+            { q: "Can two different cuboids have the same volume?", opts: ["Yes", "No", "Only if they are cubes", "Never"], a: 0 },
+            { q: "Which is the smallest volume?", opts: ["1m³", "1cm³", "1mm³", "1L"], a: 2 },
+            { q: "How many 1cm³ cubes fit in a 2cm x 2cm x 2cm box?", opts: ["4", "6", "8", "2"], a: 2 },
+            { q: "To find the volume of a room, you measure its length, width, and ______.", opts: ["Weight", "Area", "Height", "Diagonal"], a: 2 }
+        ]
+    },
+    {
+        title: "16. Rectilinear Plane Figures",
+        image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "A rectilinear figure is a plane figure bounded by ______.", opts: ["Curved lines", "Straight lines", "Circles", "Waves"], a: 1 },
+            { q: "Which of these is a rectilinear figure?", opts: ["Circle", "Oval", "Rectangle", "Sector"], a: 2 },
+            { q: "How many sides does a quadrilateral have?", opts: ["3", "4", "5", "6"], a: 1 },
+            { q: "A rectilinear figure with 3 sides is called a?", opts: ["Square", "Triangle", "Pentagon", "Circle"], a: 1 },
+            { q: "A polygon with 5 sides is a?", opts: ["Hexagon", "Pentagon", "Octagon", "Rectangle"], a: 1 },
+            { q: "A polygon with 6 sides is a?", opts: ["Pentagon", "Hexagon", "Heptagon", "Decagon"], a: 1 },
+            { q: "Which rectilinear figure has 4 equal sides and 4 right angles?", opts: ["Rectangle", "Rhombus", "Square", "Trapezium"], a: 2 },
+            { q: "The sum of all interior angles of a triangle is?", opts: ["90°", "180°", "270°", "360°"], a: 1 },
+            { q: "A figure where all sides and all angles are equal is called ______.", opts: ["Irregular", "Regular", "Complex", "Open"], a: 1 },
+            { q: "Which of these is NOT a rectilinear figure?", opts: ["Triangle", "Square", "Semicircle", "Pentagon"], a: 2 },
+            { q: "How many pairs of parallel sides does a parallelogram have?", opts: ["1", "2", "0", "4"], a: 1 },
+            { q: "A quadrilateral with only one pair of parallel sides is a?", opts: ["Square", "Rectangle", "Trapezium", "Rhombus"], a: 2 },
+            { q: "A polygon with 8 sides is an?", opts: ["Octagon", "Nonagon", "Hexagon", "Decagon"], a: 0 },
+            { q: "The sum of angles in any quadrilateral is?", opts: ["180°", "360°", "540°", "720°"], a: 1 },
+            { q: "What is the perimeter of a rectilinear figure?", opts: ["Space inside", "Total length of boundary", "Weight", "Highest point"], a: 1 },
+            { q: "A triangle with all sides equal is?", opts: ["Isosceles", "Scalene", "Equilateral", "Right-angled"], a: 2 },
+            { q: "A triangle with two sides equal is?", opts: ["Equilateral", "Isosceles", "Scalene", "Acute"], a: 1 },
+            { q: "How many diagonals can be drawn from one vertex of a pentagon?", opts: ["1", "2", "3", "5"], a: 1 },
+            { q: "Opposite angles of a parallelogram are ______.", opts: ["Equal", "Supplementary", "90°", "Unequal"], a: 0 },
+            { q: "The letter 'L' shape is an example of a ______ rectilinear figure.", opts: ["Simple", "Compound/Composite", "Curved", "Circular"], a: 1 },
+            { q: "A four-sided polygon is generally called a?", opts: ["Triangle", "Pentagon", "Quadrilateral", "Hexagon"], a: 2 },
+            { q: "An 'L' shaped room can be split into two ______.", opts: ["Circles", "Triangles", "Rectangles", "Pentagons"], a: 2 },
+            { q: "Every square is also a ______.", opts: ["Rectangle", "Rhombus", "Both of these", "None"], a: 2 },
+            { q: "Which rectilinear figure has 10 sides?", opts: ["Nonagon", "Decagon", "Octagon", "Heptagon"], a: 1 },
+            { q: "A rectilinear figure must be a ______ shape.", opts: ["Open", "Closed", "3D", "Infinite"], a: 1 }
+        ]
+    },
+    {
+        title: "17. Sets",
+        image: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1509228468518-180dd482195b?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "A collection of well-defined distinct objects is called a?", opts: ["Group", "Set", "List", "Bunch"], a: 1 },
+            { q: "Individual objects in a set are called?", opts: ["Numbers", "Members/Elements", "Parts", "Groups"], a: 1 },
+            { q: "Which symbol is used to enclose the elements of a set?", opts: ["( )", "[ ]", "{ }", "/ /"], a: 2 },
+            { q: "If A = {1, 2, 3}, how many elements are in set A?", opts: ["1", "2", "3", "6"], a: 2 },
+            { q: "A set with no elements is called a?", opts: ["Zero set", "Full set", "Null/Empty set", "Small set"], a: 2 },
+            { q: "The symbol '∈' means?", opts: ["Is equal to", "Is a member of", "Is not a member", "Is a subset"], a: 1 },
+            { q: "Which of these is a well-defined set?", opts: ["Collection of tall students", "Set of vowels in English", "Group of beautiful flowers", "List of easy questions"], a: 1 },
+            { q: "If B = {red, blue}, is 'green' ∈ B?", opts: ["Yes", "No", "Maybe", "Green is a color"], a: 1 },
+            { q: "How do we write the set of even numbers between 1 and 7?", opts: ["{1,3,5}", "{2,4,6}", "{1,2,3,4,5,6,7}", "{2,4}"], a: 1 },
+            { q: "Two sets are equal if they have ______ elements.", opts: ["Different", "The same", "Many", "No"], a: 1 },
+            { q: "The number of elements in a set is called its ______.", opts: ["Value", "Cardinal number", "Total", "Weight"], a: 1 },
+            { q: "A diagram used to represent sets is called a?", opts: ["Bar chart", "Venn diagram", "Pie chart", "Line graph"], a: 1 },
+            { q: "If S = {s, t, a, r}, which is an element of S?", opts: ["b", "r", "p", "q"], a: 1 },
+            { q: "Can elements in a set be repeated?", opts: ["Yes", "No (They should be distinct)", "Only if numbers", "Always"], a: 1 },
+            { q: "Which is the empty set?", opts: ["{0}", "{ }", "{1}", "{null}"], a: 1 },
+            { q: "Is the collection of 'good teachers' a well-defined set?", opts: ["Yes", "No (It's subjective)", "Only in Grade 6", "Always"], a: 1 },
+            { q: "The order of elements in a set ______.", opts: ["Must be alphabetical", "Must be numerical", "Does not matter", "Must stay fixed"], a: 2 },
+            { q: "Represent {prime numbers less than 10} in roster form.", opts: ["{1,2,3,5,7}", "{2,3,5,7}", "{3,5,7,9}", "{2,4,6,8}"], a: 1 },
+            { q: "If A = {1, 2} and B = {2, 1}, are A and B equal?", opts: ["Yes", "No", "Maybe", "Only if 1=2"], a: 0 },
+            { q: "Which symbol represents the Null Set?", opts: ["0", "Ø or { }", "N", "{0}"], a: 1 },
+            { q: "A set with a limited number of elements is a?", opts: ["Infinite set", "Finite set", "Small set", "Large set"], a: 1 },
+            { q: "A set with unlimited elements (like counting numbers) is?", opts: ["Finite", "Infinite", "Empty", "Universal"], a: 1 },
+            { q: "Which of these is NOT a set?", opts: ["{a, b, c}", "{1, 2, 3}", "Smart people in town", "{Sunday, Monday}"], a: 2 },
+            { q: "If X = {5, 10, 15}, what is its cardinal number n(X)?", opts: ["5", "3", "15", "30"], a: 1 },
+            { q: "A set of days in a week has how many elements?", opts: ["5", "6", "7", "12"], a: 2 }
+        ]
+    },
+    {
+        title: "18. Graphs",
+        image: "https://images.unsplash.com/photo-1551288049-bbda38a5f971?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "A graph that uses bars to represent data is called a?", opts: ["Line graph", "Bar graph", "Pie chart", "Picture graph"], a: 1 },
+            { q: "The horizontal line in a graph is the?", opts: ["Y-axis", "X-axis", "Origin", "Title"], a: 1 },
+            { q: "The vertical line in a graph is the?", opts: ["X-axis", "Y-axis", "Scale", "Legend"], a: 1 },
+            { q: "The point where the X-axis and Y-axis meet is the?", opts: ["Corner", "Origin (0,0)", "End", "Center"], a: 1 },
+            { q: "A graph that uses pictures to represent data is a?", opts: ["Bar graph", "Pictogram", "Histogram", "Line graph"], a: 1 },
+            { q: "What tells us what the graph is about?", opts: ["Scale", "Axis", "Title", "Label"], a: 2 },
+            { q: "The numbers on the axes that show the units are called the?", opts: ["Title", "Scale", "Key", "Legend"], a: 1 },
+            { q: "In a pictogram, if one 🍎 = 5 apples, what do 3 🍎🍎🍎 represent?", opts: ["3", "8", "15", "5"], a: 2 },
+            { q: "A graph used to show changes over time is usually a?", opts: ["Bar graph", "Line graph", "Circle graph", "Pictogram"], a: 1 },
+            { q: "In a bar graph, all bars must have equal ______.", opts: ["Height", "Width", "Color", "Values"], a: 1 },
+            { q: "The gap between bars in a bar graph should be ______.", opts: ["Different", "Zero", "Equal", "Random"], a: 2 },
+            { q: "If a bar reaches the number 10 on the Y-axis, its value is?", opts: ["5", "10", "20", "0"], a: 1 },
+            { q: "To represent a half-value in a pictogram, we often use a ______.", opts: ["Small icon", "Half icon", "Big icon", "Different color"], a: 1 },
+            { q: "Graphs make it easier to ______ data.", opts: ["Hide", "Compare", "Delete", "Ignore"], a: 1 },
+            { q: "Which axis usually represents categories like 'Fruit' or 'Days'?", opts: ["X-axis", "Y-axis", "Both", "None"], a: 0 },
+            { q: "Which axis usually represents 'Frequency' or 'Number of items'?", opts: ["X-axis", "Y-axis", "Origin", "Scale"], a: 1 },
+            { q: "A 'Key' or 'Legend' in a graph helps to ______.", opts: ["Draw lines", "Explain symbols/colors", "Calculate sum", "Name axis"], a: 1 },
+            { q: "Can a bar graph be drawn horizontally?", opts: ["Yes", "No", "Only for small data", "Only in books"], a: 0 },
+            { q: "What is the most common graph for discrete data?", opts: ["Line graph", "Bar graph", "Scatter plot", "Curved graph"], a: 1 },
+            { q: "If 1 icon = 10 people, how many icons for 5 people?", opts: ["1", "2", "Half", "None"], a: 2 },
+            { q: "The distance between numbers on a scale must be ______.", opts: ["Changing", "Uniform/Equal", "Decreasing", "Small"], a: 1 },
+            { q: "A graph that shows parts of a whole (percentage) is a?", opts: ["Bar graph", "Pie chart", "Line graph", "Pictogram"], a: 1 },
+            { q: "Graphs are a ______ representation of data.", opts: ["Oral", "Visual", "Hidden", "Complex"], a: 1 },
+            { q: "If the scale on Y-axis is 0, 2, 4, 6... what is the interval?", opts: ["1", "2", "4", "6"], a: 1 },
+            { q: "Which tool is best to draw neat bar graphs?", opts: ["Compass", "Protractor", "Ruler", "Eraser"], a: 2 }
+        ]
+    },
+    {
+        title: "19. Data Collection",
+        image: "https://images.unsplash.com/photo-1454165833767-027eeef1593e?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "What is the first step in data collection?", opts: ["Analysis", "Organizing", "Gathering/Recording", "Graphing"], a: 2 },
+            { q: "Information gathered for a purpose is called?", opts: ["Secrets", "Stories", "Data", "Numbers"], a: 2 },
+            { q: "Which method uses 'ticks' to count items quickly?", opts: ["Pictogram", "Tally marks", "Pie chart", "Calculator"], a: 1 },
+            { q: "In tally marks, what does a diagonal line across four lines represent?", opts: ["4", "5", "6", "10"], a: 1 },
+            { q: "Asking people questions to gather data is called a?", opts: ["Test", "Survey", "Interview", "Both Survey/Interview"], a: 3 },
+            { q: "Data collected by the person themselves is ______ data.", opts: ["Primary", "Secondary", "Third-party", "Old"], a: 0 },
+            { q: "Data taken from books or internet is ______ data.", opts: ["Primary", "Secondary", "New", "Personal"], a: 1 },
+            { q: "How do you represent '7' using tally marks?", opts: ["|||||||", "卌 ||", "卌 卌", "|||||"], a: 1 },
+            { q: "A table used to show how often something occurs is a ______ table.", opts: ["Multiplication", "Frequency", "Time", "Periodic"], a: 1 },
+            { q: "To find the favorite color of a class, you should use a ______.", opts: ["Ruler", "Thermometer", "Questionnaire", "Scale"], a: 2 },
+            { q: "Recording bird types in a garden by watching is called ______.", opts: ["Experiment", "Observation", "Guessing", "Calculation"], a: 1 },
+            { q: "Why do we use groups of 5 in tally marks?", opts: ["To look nice", "For easy counting", "Math rule", "No reason"], a: 1 },
+            { q: "The group of people from which data is collected is the ______.", opts: ["Target Group", "Set", "Audience", "Family"], a: 0 },
+            { q: "A checklist is a tool for ______.", opts: ["Calculation", "Data Collection", "Data Deletion", "Drawing"], a: 1 },
+            { q: "Which is a source of secondary data?", opts: ["Newspaper", "Own experiment", "Direct interview", "Personal survey"], a: 0 },
+            { q: "Recording the temperature every hour is an ______.", opts: ["Opinion", "Observation", "Story", "Tally"], a: 1 },
+            { q: "Data should be ______ to be useful.", opts: ["Hidden", "Organized", "Random", "Very long"], a: 1 },
+            { q: "What is the frequency of 'Red' if the tally is 卌 卌 || ?", opts: ["10", "12", "15", "7"], a: 1 },
+            { q: "Data collected first-hand is more ______.", opts: ["Difficult", "Reliable/Accurate", "Wrong", "Boring"], a: 1 },
+            { q: "The number of times an event occurs is its ______.", opts: ["Count", "Frequency", "Tally", "Score"], a: 1 },
+            { q: "Which tally represents 10?", opts: ["卌 ||||", "卌 卌", "||||||||||", "卌"], a: 1 },
+            { q: "Before collecting data, you must define the ______.", opts: ["Result", "Problem/Goal", "Conclusion", "Graph"], a: 1 },
+            { q: "Data collection can be ______ or ______.", opts: ["Easy/Hard", "Qualitative/Quantitative", "Red/Blue", "Old/New"], a: 1 },
+            { q: "A 'Census' is data collection from ______.", opts: ["One person", "The whole population", "Two schools", "Internet only"], a: 1 },
+            { q: "True or False: Data can only be numbers.", opts: ["True", "False (can be words/pics)", "Maybe", "Only in Maths"], a: 1 }
+        ]
+    },
+    {
+        title: "20. Data Interpretation",
+        image: "https://images.unsplash.com/photo-1551288049-bbda38a5f971?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1543286386-713bcd53b971?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "Analyzing and explaining the meaning of data is?", opts: ["Gathering", "Interpretation", "Tallying", "Counting"], a: 1 },
+            { q: "Looking for the highest bar in a graph helps find the ______ item.", opts: ["Smallest", "Most popular", "Cheapest", "Oldest"], a: 1 },
+            { q: "Looking for the shortest bar helps find the ______ item.", opts: ["Least popular", "Heaviest", "Best", "Tallest"], a: 0 },
+            { q: "To find the total number of people in a survey, you ______ all frequencies.", opts: ["Subtract", "Multiply", "Add", "Divide"], a: 2 },
+            { q: "If two bars have the same height, they have ______ frequency.", opts: ["Different", "Equal", "Zero", "Double"], a: 1 },
+            { q: "An 'Outlier' in data is a value that is ______.", opts: ["The average", "Very different from others", "Zero", "The title"], a: 1 },
+            { q: "Interpretation helps in making ______.", opts: ["Mistakes", "Decisions", "Graphs only", "Tallies"], a: 1 },
+            { q: "If frequency of apples is 10 and oranges 5, how many more apples are there?", opts: ["5", "10", "15", "2"], a: 0 },
+            { q: "What is the 'Mode' of a data set?", opts: ["Average", "The most frequent value", "Middle value", "Smallest value"], a: 1 },
+            { q: "Finding the difference between highest and lowest value is the ______.", opts: ["Sum", "Mean", "Range", "Mode"], a: 2 },
+            { q: "If a line graph goes up, it shows an ______.", opts: ["Increase", "Decrease", "Equality", "End"], a: 0 },
+            { q: "If a line graph goes down, it shows a ______.", opts: ["Rise", "Drop/Decrease", "Constant", "Start"], a: 1 },
+            { q: "Interpreting data from a table is ______ than raw data.", opts: ["Harder", "Easier", "Impossible", "Same"], a: 1 },
+            { q: "Which tool helps visualize trends over months?", opts: ["Bar graph", "Line graph", "Tally", "Calculator"], a: 1 },
+            { q: "A 'conclusion' is reached ______ interpretation.", opts: ["Before", "During", "After", "Never"], a: 2 },
+            { q: "If 10 people like blue and total people are 40, what fraction is that?", opts: ["1/2", "1/4", "1/10", "1/40"], a: 1 },
+            { q: "Looking for patterns in data is part of ______.", opts: ["Collection", "Organizing", "Interpretation", "Tallying"], a: 2 },
+            { q: "In a pie chart, the largest slice represents the ______ value.", opts: ["Smallest", "Average", "Largest", "Zero"], a: 2 },
+            { q: "Data interpretation involves ______.", opts: ["Critical thinking", "Guessing", "Only drawing", "Deleting data"], a: 0 },
+            { q: "If temperatures were 30, 32, 30, 35, the mode is?", opts: ["32", "35", "30", "127"], a: 2 },
+            { q: "Finding the total frequency from a table is called ______.", opts: ["Summation", "Subtraction", "Product", "Range"], a: 0 },
+            { q: "If a graph is flat, the data is ______.", opts: ["Changing fast", "Unchanged/Constant", "Wrong", "Rising"], a: 1 },
+            { q: "Interpreting a pictogram requires looking at the ______.", opts: ["Title", "Key", "Color", "Size"], a: 1 },
+            { q: "Comparing data from two different years is called ______.", opts: ["Adding", "Comparative Analysis", "Recording", "Tallying"], a: 1 },
+            { q: "Is interpretation more than just reading numbers?", opts: ["Yes", "No", "Only for scientists", "Maybe"], a: 0 }
+        ]
+    },
+    {
+        title: "21. Probability",
+        image: "https://images.unsplash.com/photo-1596495573826-3946d028b3f2?q=80&w=400&auto=format&fit=crop",
+        quizBg: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop",
+        questions: [
+            { q: "Probability is the measure of ______ of an event occurring.", opts: ["Certainty", "Chance/Likelihood", "Difficulty", "Speed"], a: 1 },
+            { q: "An event that will definitely happen has a probability of?", opts: ["0", "0.5", "1 (Certain)", "100"], a: 2 },
+            { q: "An event that can never happen is ______.", opts: ["Possible", "Impossible", "Unlikely", "Certain"], a: 1 },
+            { q: "When tossing a coin, what is the probability of getting 'Heads'?", opts: ["0", "1", "1/2", "1/4"], a: 2 },
+            { q: "When rolling a standard die, how many possible outcomes are there?", opts: ["1", "4", "6", "12"], a: 2 },
+            { q: "Rolling a '7' on a normal 6-sided die is ______.", opts: ["Likely", "Impossible", "Certain", "Unlikely"], a: 1 },
+            { q: "If there are 5 red balls and 5 blue balls, picking a red ball is ______.", opts: ["Impossible", "Certain", "Equally likely", "Unlikely"], a: 2 },
+            { q: "The probability of an event is always between ______ and ______.", opts: ["0 and 1", "1 and 10", "-1 and 1", "0 and 100"], a: 0 },
+            { q: "Which word describes a very high chance of happening?", opts: ["Impossible", "Likely", "Unlikely", "Even chance"], a: 1 },
+            { q: "Which word describes a very low chance of happening?", opts: ["Certain", "Likely", "Unlikely", "Impossible"], a: 2 },
+            { q: "Tossing a coin is an example of a ______ experiment.", opts: ["Fixed", "Random", "Certain", "Scientific"], a: 1 },
+            { q: "If tomorrow is Monday, the chance it is Sunday today is ______.", opts: ["Impossible", "Unlikely", "Certain", "Possible"], a: 2 },
+            { q: "A bag has 10 green marbles. The chance of picking a green one is?", opts: ["0", "0.5", "1 (Certain)", "1/10"], a: 2 },
+            { q: "A bag has 10 green marbles. The chance of picking a red one is?", opts: ["0 (Impossible)", "1", "0.5", "1/10"], a: 0 },
+            { q: "The sun rising in the East tomorrow is a ______ event.", opts: ["Likely", "Unlikely", "Certain", "Impossible"], a: 2 },
+            { q: "Getting an even number when rolling a die has ______ chance.", opts: ["Even (1/2)", "No", "High", "Low"], a: 0 },
+            { q: "Probability can be expressed as a ______.", opts: ["Fraction", "Decimal", "Percentage", "All of these"], a: 3 },
+            { q: "Rolling a number less than 7 on a die is ______.", opts: ["Impossible", "Certain", "Unlikely", "Even"], a: 1 },
+            { q: "The sum of probabilities of all possible outcomes is?", opts: ["0", "0.5", "1", "Depends"], a: 2 },
+            { q: "Which is more likely: rolling a '1' or rolling a '6' on a fair die?", opts: ["1", "6", "Both are equally likely", "None"], a: 2 },
+            { q: "A weather forecast says 90% rain. Rain is ______.", opts: ["Impossible", "Unlikely", "Highly likely", "Certain"], a: 2 },
+            { q: "Selecting a vowel from the word 'MATH' is ______.", opts: ["1/4", "1/2", "3/4", "0"], a: 0 },
+            { q: "In a deck of cards, picking a 'Heart' is more likely than picking the 'Ace of Spades'?", opts: ["Yes", "No", "Equal", "Impossible"], a: 0 },
+            { q: "How many outcomes are possible when tossing two coins?", opts: ["2", "4", "6", "8"], a: 1 },
+            { q: "Probability helps us understand ______.", opts: ["Past", "Present", "Uncertainty in future", "Certainty"], a: 2 }
+        ]
+    }
+];
+    
+
+    let currentLesson = null;
+    let currentQIndex = 0;
+    let userScore = 0;
+
+    function init() {
+        const grid = document.getElementById('lesson-grid');
+        mathsDatabase.forEach((lesson, index) => {
+            grid.innerHTML += `
+                <div class="lesson-card" onclick="startQuiz(${index})">
+                    <img src="${lesson.image}" class="card-image" alt="Lesson Image">
+                    <div class="card-content">
+                        <h3>${lesson.title}</h3>
+                        <span class="arrow">→</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function startQuiz(index) {
+        currentLesson = mathsDatabase[index];
+        currentQIndex = 0;
+        userScore = 0;
+        
+        const container = document.getElementById('quiz-container');
+        container.style.backgroundImage = `url('${currentLesson.quizBg}')`;
+        
+        document.getElementById('quiz-title').innerText = currentLesson.title;
+        document.getElementById('question-area').style.display = 'block';
+        document.getElementById('score-screen').style.display = 'none';
+        container.style.display = 'block';
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = currentLesson.questions[currentQIndex];
+        document.getElementById('q-text').innerText = `${currentQIndex + 1}. ${q.q}`;
+        const optionsArea = document.getElementById('options-area');
+        optionsArea.innerHTML = '';
+        q.opts.forEach((opt, i) => {
+            optionsArea.innerHTML += `<button class="option-btn" onclick="checkAnswer(${i})">${opt}</button>`;
+        });
+    }
+
+    function checkAnswer(choice) {
+        if (choice === currentLesson.questions[currentQIndex].a) userScore++;
+        currentQIndex++;
+        if (currentQIndex < currentLesson.questions.length) showQuestion();
+        else showScore();
+    }
+
+    function showScore() {
+        document.getElementById('question-area').style.display = 'none';
+        document.getElementById('score-screen').style.display = 'block';
+        document.getElementById('final-score').innerText = `Final Score: ${userScore} / ${currentLesson.questions.length}`;
+    }
+
+    function closeQuiz() {
+        document.getElementById('quiz-container').style.display = 'none';
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
