@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLanka AI Science Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #f1c40f; --secondary: #00d2ff; --dark: #0f172a;
+            --card: #1e293b; --text: #f8fafc; --success: #2ecc71; --error: #e74c3c;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--dark); color: var(--text); overflow-x: hidden; }
+
+        .header {
+            height: 220px; background: linear-gradient(45deg, #0f172a, #1e293b);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-bottom: 5px solid var(--primary); text-align: center;
+        }
+
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+
+        /* Lesson Cards */
+        #lesson-view { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .l-card { 
+            background: var(--card); padding: 30px; border-radius: 15px; cursor: pointer; 
+            text-align: center; border: 1px solid #334155; transition: 0.3s;
+        }
+        .l-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+
+        /* Loading Screen */
+        #loading { display: none; text-align: center; padding: 50px; }
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary); width: 40px; height: 40px; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Quiz Box */
+        #quiz-container { display: none; background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .q-header { display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 30px; color: var(--primary); font-weight: bold; }
+        .q-text { font-size: 1.4rem; margin-bottom: 25px; line-height: 1.5; color: white; }
+
+        .option {
+            display: block; width: 100%; padding: 16px; margin-bottom: 12px;
+            background: #0f172a; color: white; border: 1px solid #334155;
+            border-radius: 10px; cursor: pointer; text-align: left; font-size: 1.1rem; transition: 0.2s;
+        }
+        .option:hover { background: #1e293b; border-color: var(--secondary); }
+        .correct { background: var(--success) !important; border: none; }
+        .wrong { background: var(--error) !important; border: none; }
+
+        /* Certificate Design */
+        #result-screen { display: none; text-align: center; }
+        #cert-design {
+            display: none; width: 800px; height: 550px; background: white; color: #1e293b;
+            margin: 30px auto; border: 20px solid #f1c40f; padding: 40px; position: relative;
+        }
+        .cert-inner { border: 2px solid #1e293b; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .btn { background: var(--primary); color: #000; padding: 15px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 style="color: var(--primary); font-size: 2.5rem;">EDULANKA AI HUB</h1>
+    <p>Grade 6 Science - Automated Question Generator</p>
+</div>
+
+<div class="container">
+    <div id="lesson-view">
+        <div class="l-card" onclick="startAIQuiz('Diversity of Living Things')">
+            <h3>Unit 1: Diversity of Living Things</h3>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">AI will generate 50 questions</p>
+        </div>
+        <div class="l-card" onclick="startAIQuiz('Things Around Us')">
+            <h3>Unit 2: Things Around Us</h3>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">AI will generate 50 questions</p>
+        </div>
+        <div class="l-card" onclick="startAIQuiz('Water for Life')">
+            <h3>Unit 3: Water for Life</h3>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">AI will generate 50 questions</p>
+        </div>
+    </div>
+
+    <div id="loading">
+        <div class="spinner"></div>
+        <h2>AI is preparing 50 questions for you...</h2>
+        <p>This may take a few seconds.</p>
+    </div>
+
+    <div id="quiz-container">
+        <div class="q-header">
+            <span id="lesson-name-display">Science Quiz</span>
+            <span>Score: <span id="score">0</span></span>
+        </div>
+        <div id="q-content">
+            <p id="q-num" style="color: var(--secondary); font-weight: bold; margin-bottom: 10px;">Question 1 / 50</p>
+            <h2 id="q-text" class="q-text"></h2>
+            <div id="options-box"></div>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h1 style="color: var(--success);">Quiz Completed!</h1>
+        <input type="text" id="stu-name" placeholder="Enter Your Full Name" style="padding: 15px; width: 300px; margin-top: 20px; border-radius: 5px; border: none;">
+        <br>
+        <button class="btn" onclick="generateCert()">View Certificate</button>
+
+        <div id="cert-design">
+            <div class="cert-inner">
+                <p>CERTIFICATE OF ACHIEVEMENT</p>
+                <h1 style="font-size: 50px; margin: 10px 0;">EDULANKA</h1>
+                <p>This is to certify that</p>
+                <h2 id="out-name" style="font-size: 35px; color: #e67e22; margin: 15px 0;">Student Name</h2>
+                <p>successfully completed the unit</p>
+                <h3 id="out-lesson" style="font-size: 1.5rem;">Lesson Name</h3>
+                <p style="margin-top: 10px; font-weight: bold;">Score: <span id="out-score">0</span> / 50</p>
+                <p style="margin-top: 20px; font-style: italic;">Date: <span id="out-date"></span></p>
+            </div>
+        </div>
+        <br>
+        <button id="dl-btn" class="btn" style="display:none; background: #2ecc71;" onclick="downloadCert()">Download PNG</button>
+    </div>
+</div>
+
+<script>
+    // ඔබේ API Key එක මෙතැනට ඇතුළත් කරන්න
+    const API_KEY = "AIzaSyCHNO5ZbJ70kODo0lEtBoZ-ywauYQq5REk";
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+    let quizData = [];
+    let currentIdx = 0;
+    let score = 0;
+    let currentLesson = "";
+
+    async function startAIQuiz(lesson) {
+        currentLesson = lesson;
+        document.getElementById('lesson-view').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+
+        const prompt = `Generate exactly 50 multiple choice questions for Grade 6 Science lesson "${lesson}" in English medium. 
+        Return ONLY a JSON array. Each object must have: 
+        "q": "The question text", 
+        "opts": ["option1", "option2", "option3", "option4"], 
+        "a": index of correct answer (0-3).`;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+
+            const result = await response.json();
+            const rawText = result.candidates[0].content.parts[0].text;
+            const cleanJson = rawText.replace(/```json|```/g, "");
+            
+            quizData = JSON.parse(cleanJson);
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('lesson-name-display').innerText = lesson;
+            
+            showQuestion();
+        } catch (error) {
+            alert("API Error! Please check your API Key or Connection.");
+            location.reload();
+        }
+    }
+
+    function showQuestion() {
+        if (currentIdx >= quizData.length) {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            return;
+        }
+
+        const data = quizData[currentIdx];
+        document.getElementById('q-num').innerText = `Question ${currentIdx + 1} of ${quizData.length}`;
+        document.getElementById('q-text').innerText = data.q;
+        
+        const box = document.getElementById('options-box');
+        box.innerHTML = '';
+
+        data.opts.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                const all = document.querySelectorAll('.option');
+                all.forEach(b => b.style.pointerEvents = 'none');
+
+                if(i === data.a) { btn.classList.add('correct'); score++; }
+                else { btn.classList.add('wrong'); all[data.a].classList.add('correct'); }
+                
+                document.getElementById('score').innerText = score;
+                
+                setTimeout(() => {
+                    currentIdx++;
+                    window.scrollTo(0, 0);
+                    showQuestion();
+                }, 1500);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    function generateCert() {
+        const name = document.getElementById('stu-name').value;
+        if(!name) return alert("Enter your name");
+
+        document.getElementById('out-name').innerText = name.toUpperCase();
+        document.getElementById('out-lesson').innerText = currentLesson;
+        document.getElementById('out-score').innerText = score;
+        document.getElementById('out-date').innerText = new Date().toLocaleDateString();
+        
+        document.getElementById('cert-design').style.display = 'block';
+        document.getElementById('dl-btn').style.display = 'inline-block';
+        document.getElementById('cert-design').scrollIntoView();
+    }
+
+    function downloadCert() {
+        html2canvas(document.querySelector("#cert-design")).then(canvas => {
+            let link = document.createElement('a');
+            link.download = 'EduLanka-Science-Certificate.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+</script>
+
+</body>
+</html>
