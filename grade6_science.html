@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 6 Science Master | EduLanka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #2980b9; --secondary: #3498db; --bg: #ffffff;
+            --card: #f8f9fa; --text: #2c3e50; --success: #27ae60; --error: #c0392b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+        body { background-color: var(--bg); color: var(--text); }
+        .header-bg {
+            height: 180px; background: linear-gradient(rgba(41, 128, 185, 0.9), rgba(52, 152, 219, 0.9));
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; color: white; margin-bottom: 30px;
+        }
+        .container { max-width: 1000px; margin: 0 auto 50px; padding: 0 20px; }
+        #lesson-view { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .lesson-card {
+            background: var(--card); border-radius: 12px; cursor: pointer; transition: 0.3s;
+            border: 2px solid #ecf0f1; padding: 20px; text-align: center;
+        }
+        .lesson-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        #name-screen { display: none; background: white; padding: 40px; border-radius: 15px; text-align: center; max-width: 500px; margin: 50px auto; border: 1px solid #ddd; }
+        input[type="text"] { width: 100%; padding: 12px; margin: 20px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; }
+        #quiz-container { display: none; background: #fff; border-radius: 15px; padding: 30px; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .q-header { display: flex; justify-content: space-between; color: var(--primary); font-weight: 600; margin-bottom: 20px; }
+        .q-text { font-size: 1.2rem; margin-bottom: 25px; color: #34495e; font-weight: 600; }
+        .option { display: block; width: 100%; padding: 15px; margin-bottom: 10px; background: #fdfdfd; color: #2c3e50; border: 2px solid #ecf0f1; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.2s; }
+        .option:hover { background: #f0f7fb; border-color: var(--secondary); }
+        .correct { background: var(--success) !important; color: white !important; border: none; animation: pulse 0.5s; }
+        .wrong { background: var(--error) !important; color: white !important; border: none; animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        #cert-wrapper { display: none; text-align: center; }
+        #certificate { width: 800px; height: 580px; background: white; color: #2c3e50; margin: 20px auto; padding: 30px; border: 15px solid var(--primary); box-sizing: border-box; position: relative; }
+        .btn-action { background: var(--primary); color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="header-bg">
+    <h1>Grade 6 Science Master</h1>
+    <p>English Medium | Full Syllabus Challenge</p>
+</div>
+
+<div class="container">
+    <div id="lesson-view"></div>
+    <div id="name-screen">
+        <h2>Enter Your Name</h2>
+        <input type="text" id="student-name" placeholder="Full Name">
+        <button class="btn-action" onclick="confirmName()">START QUIZ</button>
+    </div>
+    <div id="quiz-container">
+        <div class="q-header"><span id="l-title-display">Lesson</span><span>Score: <span id="score-display">0</span></span></div>
+        <div id="q-progress" style="margin-bottom: 10px; color: #7f8c8d;">Question</div>
+        <div id="q-text-display" class="q-text"></div>
+        <div id="options-box"></div>
+    </div>
+    <div id="cert-wrapper">
+        <div id="certificate">
+            <div style="border: 2px solid #2980b9; height: 100%; padding: 40px;">
+                <h2 style="color: #2980b9;">CERTIFICATE OF EXCELLENCE</h2>
+                <p>This is to certify that</p>
+                <h1 id="display-name" style="font-size: 40px; margin: 20px 0;">Name</h1>
+                <p>successfully completed the lesson</p>
+                <h3 id="display-lesson" style="color: #3498db;">Lesson</h3>
+                <h2>Score: <span id="display-score">0</span> / 25</h2>
+            </div>
+        </div>
+        <button class="btn-action" onclick="downloadCert()">DOWNLOAD PNG</button>
+        <button class="btn-action" style="background: #7f8c8d;" onclick="location.reload()">HOME</button>
+    </div>
+</div>
+
+<script>
+    const scienceDB = [
+        { title: "1. Diversity of Living Things", questions: [
+            { q: "Which is a flowering plant?", opts: ["Moss", "Fern", "Rose", "Cycas"], a: 2 },
+            { q: "Example of a vertebrate:", opts: ["Snail", "Fish", "Earthworm", "Spider"], a: 1 },
+            { q: "Basic unit of life is:", opts: ["Organ", "Cell", "Tissue", "System"], a: 1 },
+            { q: "Plants make food by:", opts: ["Respiration", "Photosynthesis", "Digestion", "Evaporation"], a: 1 },
+            { q: "Which animal has a streamlined body?", opts: ["Cow", "Fish", "Elephant", "Ant"], a: 1 },
+            { q: "Monocots have which root system?", opts: ["Tap root", "Fibrous root", "Lateral", "None"], a: 1 },
+            { q: "Animal that undergoes metamorphosis:", opts: ["Cat", "Dog", "Butterfly", "Cow"], a: 2 },
+            { q: "An example of a non-flowering plant is:", opts: ["Mango", "Cycas", "Hibiscus", "Rose"], a: 1 },
+            { q: "Which gas is used for photosynthesis?", opts: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"], a: 2 },
+            { q: "Which animal uses lungs to breathe?", opts: ["Fish", "Whale", "Tadpole", "Prawn"], a: 1 },
+            { q: "A characteristic of living things is:", opts: ["Static", "Growth", "Non-responsive", "No energy use"], a: 1 },
+            { q: "Plants that live for one season are:", opts: ["Annuals", "Perennials", "Biannuals", "Trees"], a: 0 },
+            { q: "Example of an invertebrate:", opts: ["Snake", "Bat", "Snail", "Bird"], a: 2 },
+            { q: "Green pigment in leaves is:", opts: ["Hemoglobin", "Chlorophyll", "Melanin", "Starch"], a: 1 },
+            { q: "A dicot plant has:", opts: ["Parallel venation", "Reticulate venation", "No venation", "One cotyledon"], a: 1 },
+            { q: "Part of plant growing towards gravity:", opts: ["Stem", "Root", "Flower", "Leaf"], a: 1 },
+            { q: "Example of a nocturnal animal:", opts: ["Parrot", "Crow", "Bat", "Sparrow"], a: 2 },
+            { q: "Fungi belong to:", opts: ["Plants", "Animals", "Micro-organisms", "None"], a: 2 },
+            { q: "Tap root system example:", opts: ["Paddy", "Grass", "Mango", "Coconut"], a: 2 },
+            { q: "Animal living on land and water:", opts: ["Fish", "Frog", "Tiger", "Bird"], a: 1 },
+            { q: "Underwater plant example:", opts: ["Lotus", "Hydrilla", "Rose", "Cactus"], a: 1 },
+            { q: "Reproduction is a process of:", opts: ["Eating", "Producing young", "Moving", "Sleeping"], a: 1 },
+            { q: "Which animal has scales?", opts: ["Dog", "Snake", "Cat", "Frog"], a: 1 },
+            { q: "Main energy source for plants:", opts: ["Water", "Soil", "Sunlight", "Wind"], a: 2 },
+            { q: "Plants produce oxygen during:", opts: ["Night", "Photosynthesis", "Winter", "Rain"], a: 1 }
+        ]},
+        { title: "2. Things Around Us", questions: [
+            { q: "Matter is anything that has mass and:", opts: ["Color", "Occupies space", "Energy", "Sound"], a: 1 },
+            { q: "State of matter with definite shape:", opts: ["Solid", "Liquid", "Gas", "Vapor"], a: 0 },
+            { q: "Gas turning into liquid is:", opts: ["Melting", "Boiling", "Condensation", "Freezing"], a: 2 },
+            { q: "Example of a liquid:", opts: ["Iron", "Air", "Water", "Rock"], a: 2 },
+            { q: "Matter can be easily compressed in:", opts: ["Solid state", "Liquid state", "Gas state", "None"], a: 2 },
+            { q: "Water boils at:", opts: ["0°C", "50°C", "100°C", "80°C"], a: 2 },
+            { q: "Which is not matter?", opts: ["Air", "Light", "Dust", "Water"], a: 1 },
+            { q: "Process of solid changing to liquid:", opts: ["Freezing", "Melting", "Evaporation", "Boiling"], a: 1 },
+            { q: "Unit of mass is:", opts: ["Metre", "Litre", "Kilogram", "Newton"], a: 2 },
+            { q: "Diffusion is fastest in:", opts: ["Solids", "Liquids", "Gases", "Ice"], a: 2 },
+            { q: "Ice is water in which state?", opts: ["Solid", "Liquid", "Gas", "Vapor"], a: 0 },
+            { q: "Smallest particle of matter:", opts: ["Cell", "Atom", "Tissue", "Element"], a: 1 },
+            { q: "Volume is the space occupied by:", opts: ["Energy", "An object", "Light", "Time"], a: 1 },
+            { q: "Standard unit of volume:", opts: ["kg", "m", "m³", "s"], a: 2 },
+            { q: "Matter is made of:", opts: ["Particles", "Waves", "Energy", "Light"], a: 0 },
+            { q: "LPG is:", opts: ["Liquid Petroleum Gas", "Light Power Gas", "Liquefied Petroleum Gas", "Low Petrol Gas"], a: 2 },
+            { q: "Non-magnetic substance:", opts: ["Iron", "Steel", "Copper", "Nickel"], a: 2 },
+            { q: "Sublimation example:", opts: ["Ice melting", "Naphthalene balls", "Boiling water", "Iron rusting"], a: 1 },
+            { q: "Solids have:", opts: ["Fixed shape", "No fixed shape", "Fluidity", "Large gaps"], a: 0 },
+            { q: "Pure substance example:", opts: ["Air", "Sea water", "Distilled water", "Soil"], a: 2 },
+            { q: "Density is mass per unit:", opts: ["Area", "Volume", "Time", "Length"], a: 1 },
+            { q: "State of matter that flows:", opts: ["Solid", "Liquid & Gas", "Solid & Gas", "None"], a: 1 },
+            { q: "Steam is water in:", opts: ["Solid state", "Liquid state", "Gas state", "Plasma"], a: 2 },
+            { q: "Mass of an object is constant:", opts: ["Always", "Never", "Sometimes", "Only in space"], a: 0 },
+            { q: "Matter occupies space and has:", opts: ["Weight", "Mass", "Force", "Power"], a: 1 }
+        ]},
+        { title: "3. Water as a Resource", questions: [
+            { q: "Percentage of earth covered by water:", opts: ["50%", "71%", "30%", "90%"], a: 1 },
+            { q: "Main source of water:", opts: ["Sea", "Rain", "Well", "River"], a: 1 },
+            { q: "Potable water means:", opts: ["Sea water", "Drinking water", "Dirty water", "Hard water"], a: 1 },
+            { q: "Water cycle is powered by:", opts: ["Wind", "Moon", "Sun", "Tides"], a: 2 },
+            { q: "Fresh water is found in:", opts: ["Oceans", "Ice caps", "Salt lakes", "Dead sea"], a: 1 },
+            { q: "Formula for water:", opts: ["H2O", "CO2", "NaCl", "O2"], a: 0 },
+            { q: "Water-borne disease example:", opts: ["Flu", "Cholera", "Dengue", "Asthma"], a: 1 },
+            { q: "Freezing point of water:", opts: ["100°C", "0°C", "4°C", "10°C"], a: 1 },
+            { q: "Removing salt from sea water:", opts: ["Filtration", "Desalination", "Decantation", "Boiling"], a: 1 },
+            { q: "Plants lose water via:", opts: ["Respiration", "Transpiration", "Photosynthesis", "Digestion"], a: 1 },
+            { q: "Clouds are formed by:", opts: ["Evaporation", "Condensation", "Freezing", "Melting"], a: 1 },
+            { q: "Universal solvent is:", opts: ["Oil", "Alcohol", "Water", "Petrol"], a: 2 },
+            { q: "Groundwater is stored in:", opts: ["Rivers", "Aquifers", "Clouds", "Trees"], a: 1 },
+            { q: "Water density is maximum at:", opts: ["0°C", "4°C", "100°C", "10°C"], a: 1 },
+            { q: "Polluted water causes:", opts: ["Good health", "Diseases", "Better growth", "Clean environment"], a: 1 },
+            { q: "Main ocean on earth:", opts: ["Pacific", "Atlantic", "Indian", "All"], a: 3 },
+            { q: "Water vapour is a:", opts: ["Solid", "Liquid", "Gas", "Vapor"], a: 2 },
+            { q: "Saving water technique:", opts: ["Drip irrigation", "Open taps", "Cutting forests", "Burning fuel"], a: 0 },
+            { q: "Purest natural water form:", opts: ["Sea", "Well", "Rain", "River"], a: 2 },
+            { q: "Salinity means amount of ______ in water:", opts: ["Sugar", "Salt", "Dirt", "Oxygen"], a: 1 },
+            { q: "Chlorine is used to:", opts: ["Add taste", "Kill germs", "Change color", "Cool water"], a: 1 },
+            { q: "Humidity is water vapour in:", opts: ["Soil", "Air", "Oceans", "Rocks"], a: 1 },
+            { q: "Major use of water in SL:", opts: ["Industry", "Agriculture", "Cooking", "Washing"], a: 1 },
+            { q: "Flood is caused by:", opts: ["No rain", "Heavy rain", "Heat", "Wind"], a: 1 },
+            { q: "Water is needed for:", opts: ["Digestion", "Blood flow", "Cooling", "All"], a: 3 }
+        ]},
+        { title: "4. Energy in Daily Life", questions: [
+            { q: "Main source of energy:", opts: ["Moon", "Sun", "Electricity", "Coal"], a: 1 },
+            { q: "Energy in a moving car:", opts: ["Potential", "Kinetic", "Chemical", "Sound"], a: 1 },
+            { q: "Unit of energy:", opts: ["Newton", "Joule", "Watt", "Volt"], a: 1 },
+            { q: "Solar panels convert light to:", opts: ["Heat", "Electricity", "Sound", "Wind"], a: 1 },
+            { q: "Energy cannot be created or:", opts: ["Used", "Destroyed", "Changed", "Stored"], a: 1 },
+            { q: "Stored energy is called:", opts: ["Kinetic", "Potential", "Light", "Heat"], a: 1 },
+            { q: "Example of a renewable source:", opts: ["Petrol", "Wind", "Coal", "Gas"], a: 1 },
+            { q: "Sound is a form of:", opts: ["Matter", "Energy", "Force", "Light"], a: 1 },
+            { q: "We get heat from:", opts: ["Burning wood", "Sun", "Heater", "All"], a: 3 },
+            { q: "Plants store solar energy as:", opts: ["Heat", "Chemical energy", "Light", "Sound"], a: 1 },
+            { q: "Electric bulb produces light and:", opts: ["Sound", "Heat", "Wind", "Mass"], a: 1 },
+            { q: "Food gives us:", opts: ["Chemical energy", "Light", "Sound", "Kinetic energy"], a: 0 },
+            { q: "Batteries have:", opts: ["Solar energy", "Chemical energy", "Nuclear energy", "Heat"], a: 1 },
+            { q: "Windmills produce:", opts: ["Coal", "Electricity", "Oil", "Petrol"], a: 1 },
+            { q: "Energy from the sun is:", opts: ["Nuclear", "Solar", "Wind", "Tidal"], a: 1 },
+            { q: "Loudspeakers convert electricity to:", opts: ["Light", "Sound", "Heat", "Motion"], a: 1 },
+            { q: "Non-renewable energy:", opts: ["Solar", "Fossil fuels", "Hydro", "Wind"], a: 1 },
+            { q: "Burning fuels releases:", opts: ["Oxygen", "Heat energy", "Cold", "Food"], a: 1 },
+            { q: "Energy in stretched rubber:", opts: ["Kinetic", "Potential", "Light", "Sound"], a: 1 },
+            { q: "Hydro-power uses:", opts: ["Sun", "Flowing water", "Wind", "Coal"], a: 1 },
+            { q: "Conservation of energy means:", opts: ["Wasting it", "Saving it", "Creating it", "Destroying it"], a: 1 },
+            { q: "Energy needed to see:", opts: ["Sound", "Light", "Heat", "Kinetic"], a: 1 },
+            { q: "Energy in a battery:", opts: ["AC", "Chemical", "DC", "Mechanical"], a: 1 },
+            { q: "Photosynthesis uses ______ energy:", opts: ["Heat", "Light", "Sound", "Electric"], a: 1 },
+            { q: "Main energy for Earth:", opts: ["Gravity", "Sun", "Stars", "Clouds"], a: 1 }
+        ]},
+        { title: "5. Light", questions: [
+            { q: "Light travels in:", opts: ["Curves", "Straight lines", "Circles", "Zig-zags"], a: 1 },
+            { q: "Speed of light is:", opts: ["Fastest", "Slowest", "Medium", "Zero"], a: 0 },
+            { q: "Natural source of light:", opts: ["Bulb", "Moon", "Sun", "Candle"], a: 2 },
+            { q: "Moon is a:", opts: ["Luminous object", "Non-luminous object", "Star", "Planet"], a: 1 },
+            { q: "Shadows are formed by:", opts: ["Transparent objects", "Opaque objects", "Translucent objects", "Air"], a: 1 },
+            { q: "Glass is:", opts: ["Opaque", "Transparent", "Translucent", "Dark"], a: 1 },
+            { q: "Bouncing back of light:", opts: ["Refraction", "Reflection", "Absorption", "Diffraction"], a: 1 },
+            { q: "Image in a mirror is:", opts: ["Real", "Virtual", "Upside down", "Blurry"], a: 1 },
+            { q: "White light has how many colors?", opts: ["3", "5", "7", "10"], a: 2 },
+            { q: "Primary source of light:", opts: ["Sun", "Fire", "Stars", "All"], a: 3 },
+            { q: "Opaque object example:", opts: ["Clear water", "Wood", "Glass", "Plastic wrap"], a: 1 },
+            { q: "Bending of light in water:", opts: ["Reflection", "Refraction", "Straight", "Stopping"], a: 1 },
+            { q: "Lens used in spectacles:", opts: ["Mirror", "Glass lens", "Plastic", "Wood"], a: 1 },
+            { q: "Darkest part of shadow:", opts: ["Umbra", "Penumbra", "Center", "Edge"], a: 0 },
+            { q: "We see things because of:", opts: ["Shadows", "Reflection", "Darkness", "Heat"], a: 1 },
+            { q: "A non-luminous object:", opts: ["Torch", "Star", "Table", "Glow-worm"], a: 2 },
+            { q: "Example of translucent material:", opts: ["Steel", "Tracing paper", "Clear glass", "Wall"], a: 1 },
+            { q: "Solar eclipse happens when ______ is in middle:", opts: ["Earth", "Moon", "Sun", "Mars"], a: 1 },
+            { q: "Light is a form of:", opts: ["Matter", "Energy", "Force", "Solid"], a: 1 },
+            { q: "Pinhole camera produces ______ image:", opts: ["Upright", "Inverted", "Same", "No"], a: 1 },
+            { q: "Rainbow is formed by:", opts: ["Reflection", "Dispersion", "Absorption", "Shadow"], a: 1 },
+            { q: "Smooth surfaces reflect:", opts: ["Better", "Worse", "None", "Light colors only"], a: 0 },
+            { q: "Dark objects ______ more light:", opts: ["Reflect", "Absorb", "Refract", "Create"], a: 1 },
+            { q: "Star is a ______ body:", opts: ["Luminous", "Non-luminous", "Opaque only", "Transparent"], a: 0 },
+            { q: "Shadow size depends on:", opts: ["Color", "Distance from source", "Weight", "Smell"], a: 1 }
+        ]},
+        { title: "6. Sound", questions: [
+            { q: "Sound is produced by:", opts: ["Heating", "Vibrations", "Light", "Mass"], a: 1 },
+            { q: "Sound cannot travel through:", opts: ["Water", "Air", "Vacuum", "Steel"], a: 2 },
+            { q: "Unit of frequency:", opts: ["Joule", "Hertz", "Watt", "Decibel"], a: 1 },
+            { q: "Human hearing range:", opts: ["0-100Hz", "20-20,000Hz", "100-50,000Hz", "No limit"], a: 1 },
+            { q: "Loudness depends on:", opts: ["Frequency", "Amplitude", "Speed", "Color"], a: 1 },
+            { q: "Speed of sound is fastest in:", opts: ["Air", "Water", "Solids", "Vacuum"], a: 2 },
+            { q: "Unpleasant sound is:", opts: ["Music", "Noise", "Song", "Silence"], a: 1 },
+            { q: "Pitch depends on:", opts: ["Amplitude", "Frequency", "Volume", "Mass"], a: 1 },
+            { q: "Echo is caused by:", opts: ["Absorption", "Reflection", "Refraction", "Bending"], a: 1 },
+            { q: "Instrument with strings:", opts: ["Drum", "Guitar", "Flute", "Bell"], a: 1 },
+            { q: "Sound travels as:", opts: ["Particles", "Waves", "Straight lines", "Circles"], a: 1 },
+            { q: "Vocal cords are in the:", opts: ["Ear", "Larynx", "Nose", "Stomach"], a: 1 },
+            { q: "Eardrum is part of:", opts: ["Outer ear", "Middle ear", "Inner ear", "Brain"], a: 1 },
+            { q: "Ultrasound is ______ 20,000Hz:", opts: ["Below", "Above", "Exactly", "Half"], a: 1 },
+            { q: "Unit of loudness:", opts: ["Hertz", "Decibel", "Metre", "Gram"], a: 1 },
+            { q: "Sound in air is:", opts: ["Faster than light", "Slower than light", "Same speed", "Zero"], a: 1 },
+            { q: "To stop sound, we use:", opts: ["Metal", "Sound insulators", "Water", "Glass"], a: 1 },
+            { q: "High frequency sound is:", opts: ["Low pitch", "High pitch", "Soft", "Slow"], a: 1 },
+            { q: "Drum produces sound by:", opts: ["Strings", "Skin vibration", "Air column", "Blowing"], a: 1 },
+            { q: "Noise pollution causes:", opts: ["Hearing loss", "Better sleep", "Good health", "Happiness"], a: 0 },
+            { q: "Whistle works by vibrating:", opts: ["Metal", "Air", "Strings", "Water"], a: 1 },
+            { q: "Sound is a ______ wave:", opts: ["Transverse", "Longitudinal", "Light", "Static"], a: 1 },
+            { q: "Stethoscope is used to hear:", opts: ["Music", "Heartbeat", "Wind", "Stars"], a: 1 },
+            { q: "Sound reflects from ______ surfaces:", opts: ["Soft", "Hard", "Open", "Water only"], a: 1 },
+            { q: "Sound is needed for:", opts: ["Seeing", "Communication", "Photosynthesis", "Breathing"], a: 1 }
+        ]},
+        { title: "7. Magnets", questions: [
+            { q: "Magnets attract:", opts: ["Wood", "Iron", "Plastic", "Glass"], a: 1 },
+            { q: "A magnet has how many poles?", opts: ["1", "2", "3", "4"], a: 1 },
+            { q: "Like poles ______ each other:", opts: ["Attract", "Repel", "Nothing", "Stick"], a: 1 },
+            { q: "Natural magnet is:", opts: ["Steel", "Lodestone", "Alnico", "Plastic"], a: 1 },
+            { q: "Freely suspended magnet points:", opts: ["East-West", "North-South", "Up-Down", "Nowhere"], a: 1 },
+            { q: "Magnetic force is strongest at:", opts: ["Middle", "Poles", "Edges", "Surface"], a: 1 },
+            { q: "Example of magnetic material:", opts: ["Copper", "Nickel", "Aluminum", "Gold"], a: 1 },
+            { q: "Earth behaves like a:", opts: ["Star", "Huge magnet", "Moon", "Ball of fire"], a: 1 },
+            { q: "Compass uses a:", opts: ["Steel needle", "Magnetic needle", "Glass rod", "Light"], a: 1 },
+            { q: "To demagnetize, we can:", opts: ["Cool it", "Hammer it", "Paint it", "Wash it"], a: 1 },
+            { q: "Shape of a common magnet:", opts: ["Bar", "Horse-shoe", "Ring", "All"], a: 3 },
+            { q: "Opposite poles ______ each other:", opts: ["Repel", "Attract", "Ignore", "Break"], a: 1 },
+            { q: "Non-magnetic metal:", opts: ["Iron", "Steel", "Aluminum", "Cobalt"], a: 2 },
+            { q: "Magnetism can pass through:", opts: ["Paper", "Plastic", "Water", "All"], a: 3 },
+            { q: "Electromagnet works with:", opts: ["Water", "Electricity", "Wind", "Sun"], a: 1 },
+            { q: "Magnetic field is:", opts: ["Visible", "Invisible", "Solid", "Hot"], a: 1 },
+            { q: "Magnetism was discovered in:", opts: ["India", "Magnesia", "Rome", "China"], a: 1 },
+            { q: "Used to store magnets:", opts: ["Keepers", "Boxes", "Water", "Paper"], a: 0 },
+            { q: "Soft iron is used to make:", opts: ["Permanent magnets", "Electromagnets", "Wood", "Glass"], a: 1 },
+            { q: "Magnetic lines of force start from:", opts: ["South pole", "North pole", "Middle", "Anywhere"], a: 1 },
+            { q: "Magnet can attract from a ______:", opts: ["Distance", "Only when touching", "Never", "Light"], a: 0 },
+            { q: "Strongest part of magnet:", opts: ["Center", "North pole", "Both poles", "South pole"], a: 2 },
+            { q: "MRI uses:", opts: ["Sound", "Magnets", "Light", "Heat"], a: 1 },
+            { q: "Maglev trains use:", opts: ["Wheels", "Magnets", "Propellers", "Wind"], a: 1 },
+            { q: "Magnet loses power if ______:", opts: ["Heated strongly", "Painted", "Oiled", "Kept in dark"], a: 0 }
+        ]},
+        { title: "8. Electricity", questions: [
+            { q: "Flow of charges is:", opts: ["Energy", "Electricity", "Magnetism", "Light"], a: 1 },
+            { q: "Material that allows electricity:", opts: ["Insulator", "Conductor", "Opaque", "Transparent"], a: 1 },
+            { q: "Example of a conductor:", opts: ["Wood", "Plastic", "Copper", "Rubber"], a: 2 },
+            { q: "Unit of current:", opts: ["Volt", "Ampere", "Ohm", "Watt"], a: 1 },
+            { q: "Simple source of electricity:", opts: ["Bulb", "Cell", "Wire", "Switch"], a: 1 },
+            { q: "Path of electricity:", opts: ["Current", "Circuit", "Line", "Loop"], a: 1 },
+            { q: "Switch is used to:", opts: ["Make current", "Open/Close circuit", "Store energy", "Glow"], a: 1 },
+            { q: "Example of an insulator:", opts: ["Iron", "Rubber", "Water", "Copper"], a: 1 },
+            { q: "Filament in a bulb is:", opts: ["Copper", "Tungsten", "Iron", "Gold"], a: 1 },
+            { q: "Safety device in circuits:", opts: ["Switch", "Fuse", "Bulb", "Wire"], a: 1 },
+            { q: "Battery is a group of:", opts: ["Wires", "Cells", "Switches", "Bulbs"], a: 1 },
+            { q: "Short circuit causes:", opts: ["Light", "Fire/Heat", "More energy", "Nothing"], a: 1 },
+            { q: "Human body is a:", opts: ["Good conductor", "Bad conductor", "Insulator", "Non-conductor"], a: 0 },
+            { q: "Current flows from:", opts: ["- to +", "+ to -", "Middle", "Nowhere"], a: 1 },
+            { q: "Dry cell converts ______ to electricity:", opts: ["Heat", "Chemical energy", "Light", "Wind"], a: 1 },
+            { q: "Symbols are used for:", opts: ["Circuit diagrams", "Art", "Math", "Nothing"], a: 0 },
+            { q: "Insulator around wires:", opts: ["Copper", "Plastic", "Metal", "Water"], a: 1 },
+            { q: "Static electricity is from:", opts: ["Batteries", "Friction", "Wires", "Sun"], a: 1 },
+            { q: "Voltmeter measures:", opts: ["Current", "Voltage", "Resistance", "Heat"], a: 1 },
+            { q: "Series circuit has ______ path(s):", opts: ["1", "2", "Many", "0"], a: 0 },
+            { q: "LED stands for:", opts: ["Light Emitting Diode", "Low Energy Device", "Light Energy Disk", "None"], a: 0 },
+            { q: "Standard voltage in SL homes:", opts: ["110V", "230V", "400V", "12V"], a: 1 },
+            { q: "Main grid produces power via:", opts: ["Hydro/Thermal", "Solar only", "Wind only", "Coal only"], a: 0 },
+            { q: "Never touch wires with ______ hands:", opts: ["Dry", "Wet", "Gloved", "Oiled"], a: 1 },
+            { q: "Power is measured in:", opts: ["Volts", "Watts", "Amps", "Ohms"], a: 1 }
+        ]},
+        { title: "9. Heat", questions: [
+            { q: "Heat flows from:", opts: ["Cold to Hot", "Hot to Cold", "Anywhere", "Up to Down"], a: 1 },
+            { q: "Unit of temperature:", opts: ["Joule", "Celsius", "Newton", "Watt"], a: 1 },
+            { q: "Standard instrument for heat:", opts: ["Scale", "Thermometer", "Barometer", "Compass"], a: 1 },
+            { q: "Liquid in thermometers:", opts: ["Water", "Mercury", "Oil", "Petrol"], a: 1 },
+            { q: "Heat transfer in solids:", opts: ["Convection", "Conduction", "Radiation", "Evaporation"], a: 1 },
+            { q: "Heat from Sun reaches us by:", opts: ["Conduction", "Radiation", "Convection", "Wind"], a: 1 },
+            { q: "Metals expand on:", opts: ["Cooling", "Heating", "Painting", "Breaking"], a: 1 },
+            { q: "Normal human body temp:", opts: ["30°C", "37°C", "40°C", "98°C"], a: 1 },
+            { q: "Good conductor of heat:", opts: ["Wood", "Aluminum", "Plastic", "Glass"], a: 1 },
+            { q: "Land breeze occurs at:", opts: ["Day", "Night", "Summer", "Noon"], a: 1 },
+            { q: "Dark clothes are worn in:", opts: ["Summer", "Winter", "Rain", "Spring"], a: 1 },
+            { q: "Boiling point of water:", opts: ["0°C", "50°C", "100°C", "200°C"], a: 2 },
+            { q: "Heat is a form of:", opts: ["Matter", "Energy", "Weight", "Power"], a: 1 },
+            { q: "Transfer of heat in liquids:", opts: ["Conduction", "Convection", "Radiation", "Sublimation"], a: 1 },
+            { q: "Thermometer used by doctors:", opts: ["Laboratory", "Clinical", "Digital", "Both B&C"], a: 3 },
+            { q: "White clothes ______ heat:", opts: ["Absorb", "Reflect", "Create", "Destroy"], a: 1 },
+            { q: "Vacuum flask reduces heat loss by:", opts: ["Conduction", "Convection", "Radiation", "All"], a: 3 },
+            { q: "SI unit of heat:", opts: ["Celsius", "Kelvin", "Joule", "Calorie"], a: 2 },
+            { q: "Sea breeze occurs during:", opts: ["Night", "Day", "Winter", "Storm"], a: 1 },
+            { q: "Bimetallic strip is used in:", opts: ["Thermostat", "Bulb", "Scale", "Pen"], a: 0 },
+            { q: "Handle of a kettle is made of:", opts: ["Copper", "Plastic/Wood", "Iron", "Gold"], a: 1 },
+            { q: "Expansion is largest in:", opts: ["Solids", "Liquids", "Gases", "Ice"], a: 2 },
+            { q: "Absolute zero is:", opts: ["0°C", "-273.15°C", "100°C", "32°F"], a: 1 },
+            { q: "Solar heater uses ______ from Sun:", opts: ["Light", "Heat", "Sound", "Wind"], a: 1 },
+            { q: "Heat causes ______ of particles:", opts: ["Slowing", "Vibration/Movement", "Stopping", "Cooling"], a: 1 }
+        ]},
+        { title: "10. Rocks and Minerals", questions: [
+            { q: "Rocks are made of:", opts: ["Wood", "Minerals", "Plastic", "Water"], a: 1 },
+            { q: "Hardest mineral is:", opts: ["Gold", "Diamond", "Iron", "Talc"], a: 1 },
+            { q: "Rock formed from lava:", opts: ["Sedimentary", "Igneous", "Metamorphic", "Sand"], a: 1 },
+            { q: "Example of sedimentary rock:", opts: ["Granite", "Limestone", "Marble", "Basalt"], a: 1 },
+            { q: "Marble is a ______ rock:", opts: ["Igneous", "Sedimentary", "Metamorphic", "Soft"], a: 2 },
+            { q: "Molten rock inside Earth:", opts: ["Lava", "Magma", "Coal", "Oil"], a: 1 },
+            { q: "Used to make jewelry:", opts: ["Coal", "Gold", "Iron", "Copper"], a: 1 },
+            { q: "Fossils are found in ______ rocks:", opts: ["Igneous", "Sedimentary", "Metamorphic", "Lava"], a: 1 },
+            { q: "Granite is used for:", opts: ["Writing", "Building", "Eating", "Fuel"], a: 1 },
+            { q: "Mineral in pencil lead:", opts: ["Coal", "Graphite", "Iron", "Lead"], a: 1 },
+            { q: "Breaking of rocks is:", opts: ["Erosion", "Weathering", "Mining", "Melting"], a: 1 },
+            { q: "Chalk is a form of:", opts: ["Coal", "Limestone", "Granite", "Marble"], a: 1 },
+            { q: "Main component of sand:", opts: ["Iron", "Silica/Quartz", "Gold", "Water"], a: 1 },
+            { q: "Soil is formed from:", opts: ["Trees", "Rocks", "Plastic", "Air"], a: 1 },
+            { q: "Gemstones are mostly:", opts: ["Soft rocks", "Hard minerals", "Woods", "Metals"], a: 1 },
+            { q: "Red soil color is due to:", opts: ["Gold", "Iron oxide", "Water", "Sun"], a: 1 },
+            { q: "Mining is extracting minerals from:", opts: ["Air", "Earth", "Space", "Trees"], a: 1 },
+            { q: "Metamorphic means:", opts: ["Change of form", "Same form", "Old form", "Liquid form"], a: 0 },
+            { q: "Coal is used as:", opts: ["Food", "Fuel", "Jewelry", "Medicine"], a: 1 },
+            { q: "Softest mineral:", opts: ["Quartz", "Talc", "Diamond", "Gold"], a: 1 },
+            { q: "Used to make glass:", opts: ["Coal", "Silica sand", "Iron", "Marble"], a: 1 },
+            { q: "Mica is an:", opts: ["Electrical insulator", "Conductor", "Food", "Liquid"], a: 0 },
+            { q: "Pumice rock ______ in water:", opts: ["Sinks", "Floats", "Melts", "Dissolves"], a: 1 },
+            { q: "Slate is used for:", opts: ["Fuel", "Roofing/Blackboards", "Food", "Jewelry"], a: 1 },
+            { q: "Mineral in bones/teeth:", opts: ["Iron", "Calcium", "Gold", "Coal"], a: 1 }
+        ]},
+        { title: "11. Sky and Space", questions: [
+            { q: "Center of Solar System:", opts: ["Earth", "Sun", "Moon", "Jupiter"], a: 1 },
+            { q: "Largest planet:", opts: ["Mars", "Jupiter", "Saturn", "Earth"], a: 1 },
+            { q: "Earth's natural satellite:", opts: ["Sun", "Moon", "Mars", "Venus"], a: 1 },
+            { q: "Hottest planet:", opts: ["Mercury", "Venus", "Mars", "Earth"], a: 1 },
+            { q: "Planet with rings:", opts: ["Earth", "Mars", "Saturn", "Jupiter"], a: 2 },
+            { q: "Closest planet to Sun:", opts: ["Venus", "Mercury", "Earth", "Mars"], a: 1 },
+            { q: "Earth rotates from:", opts: ["East to West", "West to East", "North to South", "None"], a: 1 },
+            { q: "Days in a leap year:", opts: ["365", "366", "364", "360"], a: 1 },
+            { q: "First man on Moon:", opts: ["Yuri Gagarin", "Neil Armstrong", "Elon Musk", "Newton"], a: 1 },
+            { q: "Group of stars forming a pattern:", opts: ["Galaxy", "Constellation", "Solar system", "Orbit"], a: 1 },
+            { q: "Red planet:", opts: ["Venus", "Mars", "Jupiter", "Saturn"], a: 1 },
+            { q: "Time taken for Earth rotation:", opts: ["1 year", "24 hours", "30 days", "12 hours"], a: 1 },
+            { q: "Blue planet:", opts: ["Mars", "Earth", "Neptune", "Uranus"], a: 1 },
+            { q: "Sun is a:", opts: ["Planet", "Star", "Satellite", "Comet"], a: 1 },
+            { q: "Our galaxy name:", opts: ["Andromeda", "Milky Way", "Orion", "Alpha"], a: 1 },
+            { q: "Day and Night are caused by:", opts: ["Revolution", "Rotation", "Wind", "Clouds"], a: 1 },
+            { q: "Seasons are caused by Earth's:", opts: ["Rotation", "Revolution/Tilt", "Distance from Moon", "Heat"], a: 1 },
+            { q: "Shooting stars are:", opts: ["Stars", "Meteors", "Planets", "Suns"], a: 1 },
+            { q: "Number of planets in Solar System:", opts: ["7", "8", "9", "10"], a: 1 },
+            { q: "Morning/Evening star is:", opts: ["Mars", "Venus", "Mercury", "Saturn"], a: 1 },
+            { q: "Instrument to see stars:", opts: ["Microscope", "Telescope", "Stethoscope", "Compass"], a: 1 },
+            { q: "Galaxy is a collection of:", opts: ["Rocks", "Stars/Dust/Gas", "Only Planets", "Water"], a: 1 },
+            { q: "Artificial satellite used for:", opts: ["Communication", "Weather", "GPS", "All"], a: 3 },
+            { q: "Smallest planet:", opts: ["Mercury", "Mars", "Earth", "Venus"], a: 0 },
+            { q: "Light from Sun reaches Earth in about:", opts: ["1 sec", "8 mins", "1 hour", "24 hours"], a: 1 }
+        ]}
+    ];
+
+    let currentL = null, currentIdx = 0, currentScore = 0, studentName = "", quizSet = [];
+
+    function init() {
+        const view = document.getElementById('lesson-view');
+        scienceDB.forEach((l, i) => {
+            view.innerHTML += `<div class="lesson-card" onclick="openNameInput(${i})"><h3>${l.title}</h3><p style="margin-top:10px; font-size:0.8rem; color:#95a5a6;">25 Questions</p></div>`;
+        });
+    }
+
+    function openNameInput(index) {
+        currentL = scienceDB[index];
+        document.getElementById('lesson-view').style.display = 'none';
+        document.getElementById('name-screen').style.display = 'block';
+    }
+
+    function confirmName() {
+        const val = document.getElementById('student-name').value;
+        if(val.trim().length < 2) return alert("Please enter your name");
+        studentName = val;
+        document.getElementById('name-screen').style.display = 'none';
+        startQuiz();
+    }
+
+    function startQuiz() {
+        quizSet = [...currentL.questions].sort(() => 0.5 - Math.random()).slice(0, 25);
+        currentIdx = 0; currentScore = 0;
+        document.getElementById('quiz-container').style.display = 'block';
+        document.getElementById('l-title-display').innerText = currentL.title;
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = quizSet[currentIdx];
+        document.getElementById('q-progress').innerText = `Question ${currentIdx + 1} of 25`;
+        document.getElementById('q-text-display').innerText = q.q;
+        const box = document.getElementById('options-box');
+        box.innerHTML = '';
+        q.opts.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option'; btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, q.a, btn);
+            box.appendChild(btn);
+        });
+        window.scrollTo(0, 100);
+    }
+
+    function checkAnswer(selected, correct, btn) {
+        const btns = document.querySelectorAll('.option');
+        btns.forEach(b => b.style.pointerEvents = 'none');
+        if(selected === correct) {
+            btn.classList.add('correct'); currentScore++;
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+        } else {
+            btn.classList.add('wrong'); btns[correct].classList.add('correct');
+        }
+        document.getElementById('score-display').innerText = currentScore;
+        setTimeout(() => {
+            currentIdx++;
+            if(currentIdx < 25) renderQuestion();
+            else finishQuiz();
+        }, 1400);
+    }
+
+    function finishQuiz() {
+        document.getElementById('quiz-container').style.display = 'none';
+        document.getElementById('cert-wrapper').style.display = 'block';
+        document.getElementById('display-name').innerText = studentName;
+        document.getElementById('display-lesson').innerText = currentL.title;
+        document.getElementById('display-score').innerText = currentScore;
+    }
+
+    function downloadCert() {
+        html2canvas(document.getElementById('certificate')).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Result_${studentName}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
